@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { MESES, DIAS, DOW, formatDate, validPhone, validEmail } from "@/lib/dates";
+import { MESES, DIAS, DOW, formatDate, validPhone, validEmail, validName } from "@/lib/dates";
 
 const MAX_MONTHS_AHEAD = 2;
 
@@ -16,6 +16,7 @@ export function useCalendar() {
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
@@ -67,7 +68,7 @@ export function useCalendar() {
     return { date, disabled, isSelected, dayNum: i + 1 };
   });
 
-  const hasContact = validPhone(phone) && validEmail(email);
+  const hasContact = validName(name) && validPhone(phone) && validEmail(email);
   const isReady = selectedDate && selectedSlot && hasContact;
 
   let pickMessage = "Elige un día y una hora";
@@ -89,6 +90,8 @@ export function useCalendar() {
     setSelectedDate,
     selectedSlot,
     setSelectedSlot,
+    name,
+    setName,
     phone,
     setPhone,
     email,

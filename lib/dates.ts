@@ -13,3 +13,7 @@ export function validPhone(v: string) {
 export function validEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
+
+export function validName(v: string) {
+  return v.trim().length >= 2;
+}

@@ -17,6 +17,8 @@ export default function Consulta() {
     setSelectedDate,
     selectedSlot,
     setSelectedSlot,
+    name,
+    setName,
     phone,
     setPhone,
     email,
@@ -41,6 +43,7 @@ export default function Consulta() {
       .insert({
         fecha_consulta: selectedDate.toISOString().split('T')[0],
         hora_consulta: selectedSlot,
+        nombre: name.trim(),
         telefono: phone.trim(),
         email: email.trim(),
       })
@@ -51,7 +54,7 @@ export default function Consulta() {
       });
 
     // 2. Abrir WhatsApp de inmediato
-    const msg = `Hola 👋 Quiero agendar mi consulta gratuita de Nexo para el ${formatDate(selectedDate)} a las ${selectedSlot}.\n\nMis datos de contacto:\n📞 ${phone.trim()}\n✉️ ${email.trim()}`;
+    const msg = `Hola 👋 Soy ${name.trim()} y quiero agendar mi consulta gratuita de Nexo para el ${formatDate(selectedDate)} a las ${selectedSlot}.\n\nMis datos de contacto:\n📞 ${phone.trim()}\n✉️ ${email.trim()}`;
     window.open(waUrl(msg), '_blank', 'noopener noreferrer');
   };
 
@@ -124,6 +127,15 @@ export default function Consulta() {
               </div>
 
               <div className="cal-fields">
+                <input
+                  type="text"
+                  className="cal-input"
+                  placeholder="Tu nombre"
+                  autoComplete="name"
+                  aria-label="Nombre"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
                 <input
                   type="tel"
                   className="cal-input"
