@@ -1,20 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 html,body,.hero,.hero-video,video{background:#050505 !important;color:#f5f5f0;margin:0}
 
 :root {
   --bg: #050505;
   --bg-raise: #0a0a0b;
+  --bg-elevated: #111114;
   --fg: #f5f5f0;
+  --fg-dim: #6b6b66;
+  --fg-dim-2: #44444a;
   --dim: #6b6b66;
   --dim-2: #44444a;
   --line: rgba(255, 255, 255, 0.32);
   --line-strong: rgba(255, 255, 255, 0.7);
+  --line-soft: rgba(255, 255, 255, 0.15);
   --hair: rgba(255, 255, 255, 0.08);
   --blue: #4d7fff;
   --blue-dim: rgba(77, 127, 255, 0.14);
+  --red: #f87171;
   /* The original fonts are set up in layout.tsx via CSS variables. Let's make sure they match. */
   --sans: var(--font-inter), system-ui, sans-serif;
   --display: var(--font-space-grotesk), var(--font-inter), system-ui, sans-serif;
