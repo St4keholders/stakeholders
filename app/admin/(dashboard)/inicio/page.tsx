@@ -5,11 +5,8 @@ import {
   Users,
   TrendingUp,
   Calendar as CalendarIcon,
-  TrendingDown,
-  ArrowRight,
-  ArrowUpRight,
-  ArrowDownRight
-} from 'lucide-react'
+  TrendingDown
+} from '@/components/ui/CoolIcons'
 import DashboardChart from './DashboardChart'
 import DashboardCalendar from './DashboardCalendar'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
@@ -113,7 +110,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="flex items-start justify-between gap-8 mb-8">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
         <div>
           <div className="font-mono text-[0.65rem] tracking-[0.28em] uppercase text-[var(--fg-dim)] flex items-center gap-3 mb-2 before:content-[''] before:w-8 before:h-[1px] before:bg-[var(--line)]">
             {format(today, 'MMMM yyyy', { locale: es }).replace(/^\w/, c => c.toUpperCase())}
@@ -136,65 +133,73 @@ export default async function DashboardPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-5 hover:border-[var(--line)] transition-colors">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-[0.78rem] text-[var(--fg-dim)] font-medium">Total Leads</div>
+        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Total Leads</div>
             <div className="w-8 h-8 rounded-lg bg-[var(--blue-dim)] text-[var(--blue)] flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-sans text-3xl font-semibold tracking-tight text-[var(--fg)] my-1 leading-tight">{totalLeads || 0}</div>
-          <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-2">
-            Registrados en sistema
+          <div>
+            <div className="font-sans text-3xl font-medium text-[var(--fg)] my-1 leading-tight">{totalLeads || 0}</div>
+            <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-1">
+              Registrados en sistema
+            </div>
           </div>
         </div>
 
-        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-5 hover:border-[var(--line)] transition-colors">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-[0.78rem] text-[var(--fg-dim)] font-medium">Ingresos del Mes</div>
+        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Ingresos del Mes</div>
             <div className="w-8 h-8 rounded-lg bg-[#16a34a1a] text-[#4ade80] flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-sans text-3xl font-semibold tracking-tight text-[var(--fg)] my-1 leading-tight">{formatCOP(ingresosMes)}</div>
-          <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-2">
-            Mes en curso
+          <div>
+            <div className="font-sans text-3xl font-medium text-[var(--fg)] my-1 leading-tight">{formatCOP(ingresosMes)}</div>
+            <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-1">
+              Mes en curso
+            </div>
           </div>
         </div>
 
-        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-5 hover:border-[var(--line)] transition-colors">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-[0.78rem] text-[var(--fg-dim)] font-medium">Citas para Hoy</div>
+        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Citas para Hoy</div>
             <div className="w-8 h-8 rounded-lg bg-[#fbbf241a] text-[#fbbf24] flex items-center justify-center">
               <CalendarIcon className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-sans text-3xl font-semibold tracking-tight text-[var(--fg)] my-1 leading-tight">{citasHoy || 0}</div>
-          <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-2">
-            Pendientes de atender
+          <div>
+            <div className="font-sans text-3xl font-medium text-[var(--fg)] my-1 leading-tight">{citasHoy || 0}</div>
+            <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-1">
+              Pendientes de atender
+            </div>
           </div>
         </div>
 
-        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-5 hover:border-[var(--line)] transition-colors">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-[0.78rem] text-[var(--fg-dim)] font-medium">Costos del Mes</div>
+        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Costos del Mes</div>
             <div className="w-8 h-8 rounded-lg bg-[#f871711a] text-[#f87171] flex items-center justify-center">
               <TrendingDown className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-sans text-3xl font-semibold tracking-tight text-[var(--fg)] my-1 leading-tight">{formatCOP(costosMes)}</div>
-          <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-2">
-            Mes en curso
+          <div>
+            <div className="font-sans text-3xl font-medium text-[var(--fg)] my-1 leading-tight">{formatCOP(costosMes)}</div>
+            <div className="text-[0.75rem] text-[var(--fg-dim)] flex items-center gap-1.5 mt-1">
+              Mes en curso
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4 mb-4">
+      <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4 mb-6">
         {/* Gráfico Principal */}
-        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6">
-          <div className="flex justify-between items-baseline mb-5">
+        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="flex justify-between items-baseline mb-6">
             <div>
-              <div className="font-sans text-[1.1rem] font-semibold text-[var(--fg)]">
+              <div className="font-sans text-lg font-medium text-[var(--fg)] mb-1">
                 Ingresos vs <em className="font-serif italic font-normal text-[var(--blue)]">Costos</em>
               </div>
               <div className="text-[0.75rem] text-[var(--fg-dim)] mt-1">Evolución diaria — últimos 30 días</div>
@@ -204,12 +209,12 @@ export default async function DashboardPage() {
         </div>
 
         {/* Laterales */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6 xl:gap-8">
           <DashboardCalendar citasMes={citasMes} />
 
           {/* Top Cotizaciones */}
-          <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-5 flex-1">
-            <div className="font-sans text-[0.88rem] font-semibold flex items-center gap-2 mb-3 text-[var(--fg)]">
+          <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 flex-1 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+            <div className="font-sans text-[0.8rem] font-medium flex items-center gap-2 mb-4 text-[var(--fg-dim)]">
               <TrendingUp className="w-4 h-4 text-[var(--blue)]" /> Top Cotizaciones del Mes
             </div>
             <div className="flex flex-col">
@@ -238,8 +243,8 @@ export default async function DashboardPage() {
       {/* Top Compras en row extra si quisiéramos, pero según plan va en el lateral. Para no amontonar lo pongo debajo como widget */}
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
         <div></div>
-        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-5">
-          <div className="font-sans text-[0.88rem] font-semibold flex items-center gap-2 mb-3 text-[var(--fg)]">
+        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="font-sans text-[0.8rem] font-medium flex items-center gap-2 mb-4 text-[var(--fg-dim)]">
             <TrendingDown className="w-4 h-4 text-[var(--blue)]" /> Top Compras del Mes
           </div>
           <div className="flex flex-col">

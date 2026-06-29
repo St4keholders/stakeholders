@@ -40,7 +40,7 @@ export default function DashboardChart({ data }: { data: FlujoData[] }) {
   })
 
   return (
-    <div className="w-full h-[320px]">
+    <div className="w-full h-[420px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={formattedData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
@@ -73,18 +73,18 @@ export default function DashboardChart({ data }: { data: FlujoData[] }) {
             type="monotone"
             dataKey="ingresos"
             stroke="#4ade80"
-            strokeWidth={2}
+            strokeWidth={3}
             dot={false}
-            activeDot={{ r: 4, strokeWidth: 0, fill: '#4ade80' }}
+            activeDot={{ r: 5, strokeWidth: 0, fill: '#4ade80' }}
           />
           <Line
             name="Costos"
             type="monotone"
             dataKey="costos"
             stroke="#f87171"
-            strokeWidth={2}
+            strokeWidth={3}
             dot={false}
-            activeDot={{ r: 4, strokeWidth: 0, fill: '#f87171' }}
+            activeDot={{ r: 5, strokeWidth: 0, fill: '#f87171' }}
           />
         </LineChart>
       </ResponsiveContainer>

@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { Users, Plus, Search, Filter } from 'lucide-react'
+import { Users, Plus, Search, Filter } from '@/components/ui/CoolIcons'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
@@ -25,7 +25,7 @@ export default async function LeadsPage() {
 
   return (
     <>
-      <div className="flex items-start justify-between gap-8 mb-8">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
         <div>
           <h1 className="font-serif italic text-3xl text-[var(--fg)] tracking-tight">
             Leads y Clientes
@@ -40,8 +40,8 @@ export default async function LeadsPage() {
         </button>
       </div>
 
-      <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-[var(--line-soft)] flex gap-4 items-center bg-[rgba(255,255,255,0.02)]">
+      <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="p-6 mb-2 flex gap-4 items-center">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--fg-dim)]" />
             <input
@@ -58,7 +58,7 @@ export default async function LeadsPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
+            <thead className="bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.04)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
               <tr>
                 <th className="px-6 py-4 font-medium">Nombre / Empresa</th>
                 <th className="px-6 py-4 font-medium">Documento</th>
@@ -67,10 +67,10 @@ export default async function LeadsPage() {
                 <th className="px-6 py-4 font-medium text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--line-soft)]">
+            <tbody className="divide-y divide-[rgba(255,255,255,0.02)]">
               {leads && leads.length > 0 ? (
                 leads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors group">
+                  <tr key={lead.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-[var(--blue-dim)] text-[var(--blue)] flex items-center justify-center font-semibold text-[0.85rem]">

@@ -1,8 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { DollarSign, Plus, Search, Filter } from 'lucide-react'
+import { DollarSign, Search, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { NuevaCotizacionModal } from '@/components/admin/ventas/NuevaCotizacionModal'
 
 function formatCOP(n: number) {
   return new Intl.NumberFormat('es-CO', {
@@ -49,10 +50,7 @@ export default async function VentasPage() {
             Administra presupuestos, ventas realizadas y su estado de cobro.
           </p>
         </div>
-        <button className="bg-[var(--blue)] hover:bg-[#3d6fe5] text-white font-medium text-[0.85rem] px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-[0_4px_16px_var(--blue-dim)] hover:-translate-y-0.5">
-          <Plus className="w-4 h-4" />
-          Nueva Cotización
-        </button>
+        <NuevaCotizacionModal />
       </div>
 
       <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">

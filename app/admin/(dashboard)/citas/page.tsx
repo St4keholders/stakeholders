@@ -1,8 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { Calendar, Plus, Search, Filter } from 'lucide-react'
+import { Calendar, Search, Filter } from '@/components/ui/CoolIcons'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { NuevaCitaModal } from '@/components/admin/citas/NuevaCitaModal'
 
 export default async function CitasPage() {
   const cookieStore = await cookies()
@@ -25,15 +26,15 @@ export default async function CitasPage() {
     .order('hora_consulta', { ascending: false })
 
   const estadoColors: Record<string, string> = {
-    'pendiente': 'bg-[#fbbf241a] text-[#fbbf24] border-[#fbbf2433]',
-    'atendida': 'bg-[#4ade801a] text-[#4ade80] border-[#4ade8033]',
-    'cancelada': 'bg-[#f871711a] text-[#f87171] border-[#f8717133]',
-    'no_asistio': 'bg-[#94a3b81a] text-[#94a3b8] border-[#94a3b833]',
+    'pendiente': 'text-[#fbbf24]',
+    'atendida': 'text-[#4ade80]',
+    'cancelada': 'text-[#f87171]',
+    'no_asistio': 'text-[#94a3b8]',
   }
 
   return (
     <>
-      <div className="flex items-start justify-between gap-8 mb-8">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
         <div>
           <h1 className="font-serif italic text-3xl text-[var(--fg)] tracking-tight">
             Gestión de Citas
@@ -42,14 +43,11 @@ export default async function CitasPage() {
             Administra las consultas agendadas, reprograma o marca asistencia.
           </p>
         </div>
-        <button className="bg-[var(--blue)] hover:bg-[#3d6fe5] text-white font-medium text-[0.85rem] px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-[0_4px_16px_var(--blue-dim)] hover:-translate-y-0.5">
-          <Plus className="w-4 h-4" />
-          Nueva Cita
-        </button>
+        <NuevaCitaModal />
       </div>
 
-      <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-[var(--line-soft)] flex gap-4 items-center bg-[rgba(255,255,255,0.02)]">
+      <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="p-6 mb-2 flex gap-4 items-center">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--fg-dim)]" />
             <input
@@ -66,7 +64,7 @@ export default async function CitasPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
+            <thead className="bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.04)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
               <tr>
                 <th className="px-6 py-4 font-medium">Fecha y Hora</th>
                 <th className="px-6 py-4 font-medium">Paciente / Lead</th>
@@ -75,10 +73,10 @@ export default async function CitasPage() {
                 <th className="px-6 py-4 font-medium text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--line-soft)]">
+            <tbody className="divide-y divide-[rgba(255,255,255,0.02)]">
               {citas && citas.length > 0 ? (
                 citas.map((cita) => (
-                  <tr key={cita.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors group">
+                  <tr key={cita.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-[var(--blue-dim)] text-[var(--blue)] flex items-center justify-center">
@@ -102,8 +100,9 @@ export default async function CitasPage() {
                       <div className="text-[var(--fg-dim)] text-[0.8rem] mt-0.5">{cita.telefono || '—'}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-md text-[0.7rem] font-mono uppercase tracking-wider border ${estadoColors[cita.estado]}`}>
-                        {cita.estado}
+                      <span className={`inline-flex items-center gap-2 text-[0.82rem] font-medium ${estadoColors[cita.estado]}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${estadoColors[cita.estado].replace('text-', 'bg-')}`} />
+                        {cita.estado.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
