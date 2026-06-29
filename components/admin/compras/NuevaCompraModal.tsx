@@ -6,7 +6,11 @@ import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { registrarCompra } from '@/app/admin/_actions/compras'
 
-export function NuevaCompraModal() {
+interface NuevaCompraModalProps {
+  proveedores?: { id: string, razon_social: string }[]
+}
+
+export function NuevaCompraModal({ proveedores = [] }: NuevaCompraModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -55,7 +59,14 @@ export function NuevaCompraModal() {
             name="proveedor" 
             required 
             placeholder="Ej. Papelería Central SAS"
+            list="proveedores-list"
+            autoComplete="off"
           />
+          <datalist id="proveedores-list">
+            {proveedores.map(p => (
+              <option key={p.id} value={p.razon_social} />
+            ))}
+          </datalist>
           
           <div className="grid grid-cols-2 gap-4">
             <Input 
@@ -71,12 +82,19 @@ export function NuevaCompraModal() {
             />
           </div>
 
-          <Input 
-            label="Concepto" 
-            name="concepto" 
-            placeholder="Ej. Compra de insumos de oficina"
-            required
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <Input 
+              label="Concepto" 
+              name="concepto" 
+              placeholder="Ej. Compra de insumos de oficina"
+              required
+            />
+            <Input 
+              label="Fecha Vencimiento" 
+              name="fecha_vencimiento" 
+              type="date"
+            />
+          </div>
 
           <Input 
             label="Total (COP)" 

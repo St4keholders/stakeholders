@@ -33,6 +33,11 @@ export default async function VentasPage() {
     .select('*, leads(nombre, razon_social)')
     .order('fecha_emision', { ascending: false })
 
+  const { data: leads } = await supabase
+    .from('leads')
+    .select('id, nombre, razon_social')
+    .order('nombre', { ascending: true })
+
   const estadoColors: Record<string, string> = {
     'borrador': 'bg-[#94a3b81a] text-[#94a3b8] border-[#94a3b833]',
     'enviada': 'bg-[#fbbf241a] text-[#fbbf24] border-[#fbbf2433]',
@@ -51,7 +56,7 @@ export default async function VentasPage() {
             Administra presupuestos, ventas realizadas y su estado de cobro.
           </p>
         </div>
-        <NuevaCotizacionModal />
+        <NuevaCotizacionModal leads={leads || []} />
       </div>
 
       <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">

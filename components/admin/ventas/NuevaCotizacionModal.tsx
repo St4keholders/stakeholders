@@ -6,7 +6,11 @@ import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { crearCotizacion } from '@/app/admin/_actions/ventas'
 
-export function NuevaCotizacionModal() {
+interface NuevaCotizacionModalProps {
+  leads?: { id: string, nombre: string, razon_social: string }[]
+}
+
+export function NuevaCotizacionModal({ leads = [] }: NuevaCotizacionModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -51,11 +55,18 @@ export function NuevaCotizacionModal() {
           )}
           
           <Input 
-            label="Cliente (Nombre o Razón Social)" 
+            label="Cliente o Lead (Nombre)" 
             name="cliente" 
             required 
             placeholder="Ej. Juan Pérez"
+            list="leads-list"
+            autoComplete="off"
           />
+          <datalist id="leads-list">
+            {leads.map(l => (
+              <option key={l.id} value={l.nombre || l.razon_social || ''} />
+            ))}
+          </datalist>
           
           <div className="grid grid-cols-2 gap-4">
             <Input 
@@ -65,6 +76,12 @@ export function NuevaCotizacionModal() {
               required
             />
             <Input 
+              label="Válida Hasta" 
+              name="valida_hasta" 
+              type="date"
+            />
+          </div>
+            <Input 
               label="Total (COP)" 
               name="total" 
               type="number"
@@ -73,7 +90,6 @@ export function NuevaCotizacionModal() {
               required
               placeholder="1500000"
             />
-          </div>
 
           <div className="w-full flex flex-col gap-1.5">
             <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">

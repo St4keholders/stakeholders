@@ -65,11 +65,14 @@ export async function crearCotizacion(formData: FormData) {
     const seq = (count || 0) + 1
     const numero = `SH-${anio}-${seq.toString().padStart(4, '0')}`
 
+    const valida_hasta = formData.get('valida_hasta') as string
+
     // 3. Crear la cotizacion
     const { error: errVenta } = await supabase.from('cotizaciones').insert({
       numero,
       lead_id: leadId,
       fecha_emision: fecha,
+      valida_hasta: valida_hasta || null,
       subtotal: total, 
       descuento_total: 0,
       iva_total: 0,
@@ -87,6 +90,48 @@ export async function crearCotizacion(formData: FormData) {
     return { ok: true }
   } catch (err: any) {
     console.error('Error al registrar cotizacion:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}
+
+export async function actualizarCotizacion(id: string, formData: FormData) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const estado = formData.get('estado') as string
+    const valida_hasta = formData.get('valida_hasta') as string
+
+    if (!estado) {
+      return { ok: false, error: 'Faltan campos obligatorios' }
+    }
+
+    const { error } = await supabase
+      .from('cotizaciones')
+      .update({ 
+        estado,
+        valida_hasta: valida_hasta || null
+      })
+      .eq('id', id)
+
+    if (error) throw error
+
+    revalidatePath('/admin/ventas')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al actualizar cotizacion:', err)
     return { ok: false, error: err.message || 'Error interno' }
   }
 }

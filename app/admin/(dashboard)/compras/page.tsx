@@ -33,6 +33,11 @@ export default async function ComprasPage() {
     .select('*, proveedores(razon_social)')
     .order('fecha_factura', { ascending: false })
 
+  const { data: proveedores } = await supabase
+    .from('proveedores')
+    .select('id, razon_social')
+    .order('razon_social', { ascending: true })
+
   const estadoColors: Record<string, string> = {
     'pendiente': 'bg-[#fbbf241a] text-[#fbbf24] border-[#fbbf2433]',
     'pagada': 'bg-[#4ade801a] text-[#4ade80] border-[#4ade8033]',
@@ -50,7 +55,7 @@ export default async function ComprasPage() {
             Registro de compras a proveedores y control de gastos.
           </p>
         </div>
-        <NuevaCompraModal />
+        <NuevaCompraModal proveedores={proveedores || []} />
       </div>
 
       <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">

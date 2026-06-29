@@ -48,3 +48,39 @@ export async function crearCita(formData: FormData) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+export async function actualizarCita(id: string, formData: FormData) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const estado = formData.get('estado') as string
+
+    if (!estado) {
+      return { ok: false, error: 'Faltan campos obligatorios' }
+    }
+
+    const { error } = await supabase
+      .from('consultas')
+      .update({ estado })
+      .eq('id', id)
+
+    if (error) throw error
+
+    revalidatePath('/admin/citas')
+    revalidatePath('/admin/inicio')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al actualizar cita:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}

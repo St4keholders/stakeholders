@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { CreditCard, ArrowUpRight, ArrowDownRight, Search, Filter } from 'lucide-react'
-import { format } from 'date-fns'
+import { CreditCard, ArrowUpRight, ArrowDownRight, Search, Filter, AlertCircle, Calendar } from 'lucide-react'
+import { format, isPast, isToday } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 function formatCOP(n: number) {
@@ -26,23 +26,45 @@ export default async function TesoreriaPage() {
     }
   )
 
-  const { data: ingresos } = await supabase
-    .from('pagos_cotizaciones')
-    .select('*, cotizaciones(numero, leads(nombre, razon_social))')
-    .order('fecha', { ascending: false })
-    .limit(10)
+  // Consultar cotizaciones pendientes (cuentas por cobrar)
+  const { data: pendientesCobro } = await supabase
+    .from('cotizaciones')
+    .select('id, numero, leads(nombre, razon_social), total, moneda, valida_hasta, estado')
+    .in('estado', ['enviada', 'aceptada'])
+    .order('valida_hasta', { ascending: true, nullsFirst: false })
 
-  const { data: egresos } = await supabase
-    .from('pagos_compras')
-    .select('*, compras(numero, proveedores(razon_social))')
-    .order('fecha', { ascending: false })
-    .limit(10)
+  // Consultar compras pendientes (cuentas por pagar)
+  const { data: pendientesPago } = await supabase
+    .from('compras')
+    .select('id, numero, proveedores(razon_social), total, fecha_vencimiento, estado')
+    .eq('estado', 'pendiente')
+    .order('fecha_vencimiento', { ascending: true, nullsFirst: false })
     
-  // Combinar y ordenar
+  // Combinar y ordenar por fecha
   const movimientos = [
-    ...(ingresos || []).map(i => ({ ...i, tipo: 'ingreso', ref: i.cotizaciones?.numero, nombre: (i.cotizaciones?.leads as any)?.nombre || (i.cotizaciones?.leads as any)?.razon_social })),
-    ...(egresos || []).map(e => ({ ...e, tipo: 'egreso', ref: e.compras?.numero, nombre: (e.compras?.proveedores as any)?.razon_social }))
-  ].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+    ...(pendientesCobro || []).map(c => ({ 
+      id: c.id,
+      tipo: 'por_cobrar', 
+      ref: c.numero, 
+      nombre: (c.leads as any)?.nombre || (c.leads as any)?.razon_social,
+      monto: c.total,
+      fecha: c.valida_hasta,
+      estado: c.estado
+    })),
+    ...(pendientesPago || []).map(p => ({ 
+      id: p.id,
+      tipo: 'por_pagar', 
+      ref: p.numero, 
+      nombre: (p.proveedores as any)?.razon_social,
+      monto: p.total,
+      fecha: p.fecha_vencimiento,
+      estado: p.estado
+    }))
+  ].sort((a, b) => {
+    if (!a.fecha) return 1
+    if (!b.fecha) return -1
+    return new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+  })
 
   return (
     <>
@@ -52,7 +74,7 @@ export default async function TesoreriaPage() {
             Tesorería y Flujo
           </h1>
           <p className="mt-2 text-[var(--fg-dim)] text-[0.92rem]">
-            Control de ingresos, egresos y conciliación bancaria.
+            Control de cuentas por cobrar y por pagar pendientes (Deadlines).
           </p>
         </div>
       </div>
@@ -77,50 +99,64 @@ export default async function TesoreriaPage() {
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
               <tr>
-                <th className="px-6 py-4 font-medium">Movimiento</th>
-                <th className="px-6 py-4 font-medium">Fecha</th>
-                <th className="px-6 py-4 font-medium">Método</th>
-                <th className="px-6 py-4 font-medium">Monto</th>
+                <th className="px-6 py-4 font-medium">Movimiento / Cliente / Proveedor</th>
+                <th className="px-6 py-4 font-medium">Fecha Límite (Deadline)</th>
+                <th className="px-6 py-4 font-medium">Estado</th>
+                <th className="px-6 py-4 font-medium text-right">Monto</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--line-soft)]">
               {movimientos && movimientos.length > 0 ? (
-                movimientos.map((mov, idx) => (
-                  <tr key={idx} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${mov.tipo === 'ingreso' ? 'bg-[#4ade801a] text-[#4ade80]' : 'bg-[#f871711a] text-[#f87171]'}`}>
-                          {mov.tipo === 'ingreso' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
-                        </div>
-                        <div>
-                          <div className="font-medium text-[var(--fg)]">
-                            Pago {mov.ref || 'N/A'}
+                movimientos.map((mov, idx) => {
+                  const hasDate = Boolean(mov.fecha)
+                  const isVencido = hasDate && isPast(new Date(mov.fecha)) && !isToday(new Date(mov.fecha))
+                  const esPorCobrar = mov.tipo === 'por_cobrar'
+
+                  return (
+                    <tr key={idx} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${esPorCobrar ? 'bg-[#4ade801a] text-[#4ade80]' : 'bg-[#f871711a] text-[#f87171]'}`}>
+                            {esPorCobrar ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                           </div>
-                          <div className="text-[var(--fg-dim)] font-mono text-[0.75rem] mt-0.5">
-                            {mov.nombre || 'Desconocido'}
+                          <div>
+                            <div className="font-medium text-[var(--fg)]">
+                              {esPorCobrar ? 'CxC' : 'CxP'} - {mov.ref || 'N/A'}
+                            </div>
+                            <div className="text-[var(--fg-dim)] font-mono text-[0.75rem] mt-0.5">
+                              {mov.nombre || 'Desconocido'}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-[var(--fg-dim)]">
-                      {format(new Date(mov.fecha), 'MMM d, yyyy', { locale: es })}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 rounded-md text-[0.7rem] font-mono uppercase tracking-wider border border-[var(--line-soft)] text-[var(--fg-dim)] bg-[rgba(255,255,255,0.02)]">
-                        {mov.metodo_pago}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`font-mono font-medium ${mov.tipo === 'ingreso' ? 'text-[#4ade80]' : 'text-[#f87171]'}`}>
-                        {mov.tipo === 'ingreso' ? '+' : '-'}{formatCOP(mov.monto)}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-6 py-4">
+                        {hasDate ? (
+                          <div className={`flex items-center gap-2 ${isVencido ? 'text-[#f87171]' : 'text-[var(--fg)]'}`}>
+                            <Calendar className="w-4 h-4" />
+                            {format(new Date(mov.fecha), 'MMM d, yyyy', { locale: es })}
+                            {isVencido && <span title="Vencido"><AlertCircle className="w-4 h-4" /></span>}
+                          </div>
+                        ) : (
+                          <span className="text-[var(--fg-dim)] italic">Sin fecha límite</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-2.5 py-1 rounded-md text-[0.7rem] font-mono uppercase tracking-wider border border-[var(--line-soft)] text-[var(--fg-dim)] bg-[rgba(255,255,255,0.02)]">
+                          {mov.estado}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className={`font-mono font-medium ${esPorCobrar ? 'text-[#4ade80]' : 'text-[#f87171]'}`}>
+                          {esPorCobrar ? '+' : '-'}{formatCOP(mov.monto)}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               ) : (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center text-[var(--fg-dim)] italic">
-                    No hay movimientos registrados.
+                    No hay cuentas por cobrar o por pagar registradas.
                   </td>
                 </tr>
               )}

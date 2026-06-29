@@ -65,11 +65,14 @@ export async function registrarCompra(formData: FormData) {
     const seq = (count || 0) + 1
     const numero = `C-${anio}-${seq.toString().padStart(4, '0')}`
 
+    const fecha_vencimiento = formData.get('fecha_vencimiento') as string
+
     // 3. Crear la compra
     const { error: errCompra } = await supabase.from('compras').insert({
       numero,
       proveedor_id: proveedorId,
       fecha_factura: fecha,
+      fecha_vencimiento: fecha_vencimiento || null,
       ref_externa: refExterna || null,
       concepto: concepto || 'Compra general',
       subtotal: total, // Simplificado, sin calcular retenciones para el MVP
@@ -87,6 +90,48 @@ export async function registrarCompra(formData: FormData) {
     return { ok: true }
   } catch (err: any) {
     console.error('Error al registrar compra:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}
+
+export async function actualizarCompra(id: string, formData: FormData) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const estado = formData.get('estado') as string
+    const fecha_vencimiento = formData.get('fecha_vencimiento') as string
+
+    if (!estado) {
+      return { ok: false, error: 'Faltan campos obligatorios' }
+    }
+
+    const { error } = await supabase
+      .from('compras')
+      .update({ 
+        estado,
+        fecha_vencimiento: fecha_vencimiento || null
+      })
+      .eq('id', id)
+
+    if (error) throw error
+
+    revalidatePath('/admin/compras')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al actualizar compra:', err)
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
