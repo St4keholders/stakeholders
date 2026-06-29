@@ -1,8 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { Users, Plus, Search, Filter } from '@/components/ui/CoolIcons'
+import { Search, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { NuevoLeadModal } from '@/components/admin/leads/NuevoLeadModal'
+import { DetalleLeadModal } from '@/components/admin/leads/DetalleLeadModal'
 
 export default async function LeadsPage() {
   const cookieStore = await cookies()
@@ -23,30 +25,36 @@ export default async function LeadsPage() {
     .select('*')
     .order('created_at', { ascending: false })
 
+  const estadoColors: Record<string, string> = {
+    'nuevo': 'bg-[#4d7fff1a] text-[#4d7fff] border-[#4d7fff33]',
+    'contactado': 'bg-[#fbbf241a] text-[#fbbf24] border-[#fbbf2433]',
+    'cotizado': 'bg-[#c084fc1a] text-[#c084fc] border-[#c084fc33]',
+    'ganado': 'bg-[#4ade801a] text-[#4ade80] border-[#4ade8033]',
+    'perdido': 'bg-[#f871711a] text-[#f87171] border-[#f8717133]',
+    'frio': 'bg-[rgba(255,255,255,0.05)] text-[var(--fg-dim)] border-[var(--line-soft)]',
+  }
+
   return (
     <>
-      <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
+      <div className="flex items-start justify-between gap-8 mb-8">
         <div>
           <h1 className="font-serif italic text-3xl text-[var(--fg)] tracking-tight">
-            Leads y Clientes
+            Directorio de Leads
           </h1>
           <p className="mt-2 text-[var(--fg-dim)] text-[0.92rem]">
-            Gestiona la base de datos de prospectos y clientes.
+            Gestiona la información de tus prospectos y clientes.
           </p>
         </div>
-        <button className="bg-[var(--blue)] hover:bg-[#3d6fe5] text-white font-medium text-[0.85rem] px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-[0_4px_16px_var(--blue-dim)] hover:-translate-y-0.5">
-          <Plus className="w-4 h-4" />
-          Nuevo Lead
-        </button>
+        <NuevoLeadModal />
       </div>
 
-      <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
-        <div className="p-6 mb-2 flex gap-4 items-center">
+      <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">
+        <div className="p-4 border-b border-[var(--line-soft)] flex gap-4 items-center bg-[rgba(255,255,255,0.02)]">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--fg-dim)]" />
             <input
               type="text"
-              placeholder="Buscar por nombre, empresa o documento..."
+              placeholder="Buscar por nombre, email o teléfono..."
               className="w-full bg-[var(--bg-elevated)] border border-[var(--line-soft)] rounded-lg pl-9 pr-4 py-2 text-sm focus:border-[var(--blue)] focus:ring-1 focus:ring-[var(--blue)] outline-none transition-all"
             />
           </div>
@@ -98,9 +106,7 @@ export default async function LeadsPage() {
                       {format(new Date(lead.created_at), 'MMM d, yyyy', { locale: es })}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-[var(--blue)] hover:text-[#3d6fe5] font-medium text-[0.8rem] transition-colors opacity-0 group-hover:opacity-100">
-                        Ver perfil
-                      </button>
+                      <DetalleLeadModal lead={lead} />
                     </td>
                   </tr>
                 ))

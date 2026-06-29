@@ -4,6 +4,7 @@ import { DollarSign, Search, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NuevaCotizacionModal } from '@/components/admin/ventas/NuevaCotizacionModal'
+import { DetalleCotizacionModal } from '@/components/admin/ventas/DetalleCotizacionModal'
 
 function formatCOP(n: number) {
   return new Intl.NumberFormat('es-CO', {
@@ -111,9 +112,7 @@ export default async function VentasPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-[var(--blue)] hover:text-[#3d6fe5] font-medium text-[0.8rem] transition-colors opacity-0 group-hover:opacity-100">
-                        Ver detalle
-                      </button>
+                      <DetalleCotizacionModal cotizacion={cot} />
                     </td>
                   </tr>
                 ))

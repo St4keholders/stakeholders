@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import { Truck, Plus, Search, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { NuevoProveedorModal } from '@/components/admin/proveedores/NuevoProveedorModal'
+import { DetalleProveedorModal } from '@/components/admin/proveedores/DetalleProveedorModal'
 
 export default async function ProveedoresPage() {
   const cookieStore = await cookies()
@@ -34,10 +36,7 @@ export default async function ProveedoresPage() {
             Gestiona la base de datos de proveedores y contratistas.
           </p>
         </div>
-        <button className="bg-[var(--blue)] hover:bg-[#3d6fe5] text-white font-medium text-[0.85rem] px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-[0_4px_16px_var(--blue-dim)] hover:-translate-y-0.5">
-          <Plus className="w-4 h-4" />
-          Nuevo Proveedor
-        </button>
+        <NuevoProveedorModal />
       </div>
 
       <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">
@@ -99,9 +98,7 @@ export default async function ProveedoresPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-[var(--blue)] hover:text-[#3d6fe5] font-medium text-[0.8rem] transition-colors opacity-0 group-hover:opacity-100">
-                        Editar
-                      </button>
+                      <DetalleProveedorModal proveedor={prov} />
                     </td>
                   </tr>
                 ))

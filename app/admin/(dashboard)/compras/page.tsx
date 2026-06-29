@@ -4,6 +4,7 @@ import { ShoppingCart, Search, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NuevaCompraModal } from '@/components/admin/compras/NuevaCompraModal'
+import { DetalleCompraModal } from '@/components/admin/compras/DetalleCompraModal'
 
 function formatCOP(n: number) {
   return new Intl.NumberFormat('es-CO', {
@@ -110,9 +111,7 @@ export default async function ComprasPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-[var(--blue)] hover:text-[#3d6fe5] font-medium text-[0.8rem] transition-colors opacity-0 group-hover:opacity-100">
-                        Ver detalle
-                      </button>
+                      <DetalleCompraModal compra={compra} />
                     </td>
                   </tr>
                 ))

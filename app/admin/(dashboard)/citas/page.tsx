@@ -4,6 +4,7 @@ import { Calendar, Search, Filter } from '@/components/ui/CoolIcons'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NuevaCitaModal } from '@/components/admin/citas/NuevaCitaModal'
+import { DetalleCitaModal } from '@/components/admin/citas/DetalleCitaModal'
 
 export default async function CitasPage() {
   const cookieStore = await cookies()
@@ -106,9 +107,7 @@ export default async function CitasPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-[var(--blue)] hover:text-[#3d6fe5] font-medium text-[0.8rem] transition-colors opacity-0 group-hover:opacity-100">
-                        Ver detalle
-                      </button>
+                      <DetalleCitaModal cita={cita} />
                     </td>
                   </tr>
                 ))
