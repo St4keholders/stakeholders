@@ -83,8 +83,8 @@ export function AdminSidebar({ user }: { user: UserProps }) {
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="px-6 pb-6 flex items-center gap-3 border-b border-[var(--line-soft)] mb-2 animate-in-stagger" style={{ animationDelay: '0ms' }}>
-        <div className="w-9 h-9 flex items-center justify-center shrink-0">
-          <img src="/logo-nexo.png" alt="Stakeholders Logo" className="w-8 h-8 object-contain" />
+        <div className="w-12 h-12 flex items-center justify-center shrink-0">
+          <img src="/logo-nexo.png" alt="Stakeholders Logo" className="w-full h-full object-contain" />
         </div>
         <div>
           <div className="font-serif italic text-lg leading-tight text-[var(--fg)]">Stakeholders</div>
