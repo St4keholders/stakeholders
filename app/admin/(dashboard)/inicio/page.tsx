@@ -112,9 +112,7 @@ export default async function DashboardPage() {
     <>
       <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
         <div>
-          <div className="font-mono text-[0.65rem] tracking-[0.28em] uppercase text-[var(--fg-dim)] flex items-center gap-3 mb-2 before:content-[''] before:w-8 before:h-[1px] before:bg-[var(--line)]">
-            {format(today, 'MMMM yyyy', { locale: es }).replace(/^\w/, c => c.toUpperCase())}
-          </div>
+
           <h1 className="font-serif italic text-3xl text-[var(--blue)]">
             <span className="font-sans not-italic font-semibold text-[var(--fg)] tracking-tight mr-2">Hola,</span>
             {userName}

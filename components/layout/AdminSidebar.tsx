@@ -83,8 +83,8 @@ export function AdminSidebar({ user }: { user: UserProps }) {
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="px-6 pb-6 flex items-center gap-3 border-b border-[var(--line-soft)] mb-2 animate-in-stagger" style={{ animationDelay: '0ms' }}>
-        <div className="w-9 h-9 rounded-xl bg-[var(--blue-dim)] text-[var(--blue)] shadow-[inset_0_0_0_1px_rgba(77,127,255,0.2)] flex items-center justify-center shrink-0">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div className="w-9 h-9 flex items-center justify-center shrink-0">
+          <img src="/logo-nexo.png" alt="Stakeholders Logo" className="w-8 h-8 object-contain" />
         </div>
         <div>
           <div className="font-serif italic text-lg leading-tight text-[var(--fg)]">Stakeholders</div>
