@@ -1,12 +1,39 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { Search, Filter } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NuevoLeadModal } from '@/components/admin/leads/NuevoLeadModal'
 import { DetalleLeadModal } from '@/components/admin/leads/DetalleLeadModal'
+import { BotonEliminar } from '@/components/admin/BotonEliminar'
+import { eliminarLead } from '@/app/admin/_actions/leads'
+import Link from 'next/link'
 
-export default async function LeadsPage() {
+interface PageProps {
+  searchParams: Promise<{
+    sortBy?: string
+    sortOrder?: 'asc' | 'desc'
+  }>
+}
+
+function getSortLink(currentSortBy: string, currentSortOrder: string, column: string) {
+  if (currentSortBy === column) {
+    return `?sortBy=${column}&sortOrder=${currentSortOrder === 'asc' ? 'desc' : 'asc'}`
+  }
+  return `?sortBy=${column}&sortOrder=asc`
+}
+
+function SortIcon({ column, currentSortBy, currentSortOrder }: { column: string, currentSortBy: string, currentSortOrder: string }) {
+  if (currentSortBy !== column) {
+    return <ArrowUpDown className="w-3.5 h-3.5 opacity-40 ml-1 inline-block" />
+  }
+  return currentSortOrder === 'asc' 
+    ? <ArrowUp className="w-3.5 h-3.5 text-[var(--blue)] ml-1 inline-block" />
+    : <ArrowDown className="w-3.5 h-3.5 text-[var(--blue)] ml-1 inline-block" />
+}
+
+export default async function LeadsPage({ searchParams }: PageProps) {
+  const { sortBy = 'created_at', sortOrder = 'desc' } = await searchParams
   const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,7 +50,7 @@ export default async function LeadsPage() {
   const { data: leads } = await supabase
     .from('leads')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order(sortBy, { ascending: sortOrder === 'asc' })
 
   const estadoColors: Record<string, string> = {
     'nuevo': 'bg-[#4d7fff1a] text-[#4d7fff] border-[#4d7fff33]',
@@ -68,11 +95,26 @@ export default async function LeadsPage() {
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.04)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
               <tr>
-                <th className="px-6 py-4 font-medium">Nombre / Empresa</th>
-                <th className="px-6 py-4 font-medium">Documento</th>
-                <th className="px-6 py-4 font-medium">Contacto</th>
-                <th className="px-6 py-4 font-medium">Fecha de Registro</th>
-                <th className="px-6 py-4 font-medium text-right">Acciones</th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'nombre')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Nombre / Empresa
+                    <SortIcon column="nombre" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'numero_documento')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Documento
+                    <SortIcon column="numero_documento" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium select-none">Contacto</th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'created_at')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Fecha de Registro
+                    <SortIcon column="created_at" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium text-right select-none">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgba(255,255,255,0.02)]">
@@ -105,8 +147,13 @@ export default async function LeadsPage() {
                     <td className="px-6 py-4 text-[var(--fg-dim)]">
                       {format(new Date(lead.created_at), 'MMM d, yyyy', { locale: es })}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-1">
                       <DetalleLeadModal lead={lead} />
+                      <BotonEliminar 
+                        id={lead.id} 
+                        action={eliminarLead} 
+                        confirmMessage={`¿Estás seguro de que deseas eliminar el lead "${lead.nombre || 'este lead'}"?`} 
+                      />
                     </td>
                   </tr>
                 ))

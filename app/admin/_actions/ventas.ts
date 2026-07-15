@@ -177,3 +177,33 @@ export async function actualizarCotizacion(id: string, formData: FormData) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+
+export async function eliminarCotizacion(id: string) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    const { error } = await supabase.from('cotizaciones').delete().eq('id', id)
+    if (error) {
+      if (error.code === '23503') {
+        return { ok: false, error: 'No se puede eliminar esta cotización porque tiene pagos registrados.' }
+      }
+      throw error
+    }
+
+    revalidatePath('/admin/ventas')
+    revalidatePath('/admin/inicio')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al eliminar cotizacion:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}

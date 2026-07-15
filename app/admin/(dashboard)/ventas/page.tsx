@@ -1,10 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { DollarSign, Search, Filter } from 'lucide-react'
+import { DollarSign, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NuevaCotizacionModal } from '@/components/admin/ventas/NuevaCotizacionModal'
 import { DetalleCotizacionModal } from '@/components/admin/ventas/DetalleCotizacionModal'
+import { BotonEliminar } from '@/components/admin/BotonEliminar'
+import { eliminarCotizacion } from '@/app/admin/_actions/ventas'
+import Link from 'next/link'
+
+interface PageProps {
+  searchParams: Promise<{
+    sortBy?: string
+    sortOrder?: 'asc' | 'desc'
+  }>
+}
 
 function formatCOP(n: number) {
   return new Intl.NumberFormat('es-CO', {
@@ -14,7 +24,24 @@ function formatCOP(n: number) {
   }).format(n)
 }
 
-export default async function VentasPage() {
+function getSortLink(currentSortBy: string, currentSortOrder: string, column: string) {
+  if (currentSortBy === column) {
+    return `?sortBy=${column}&sortOrder=${currentSortOrder === 'asc' ? 'desc' : 'asc'}`
+  }
+  return `?sortBy=${column}&sortOrder=asc`
+}
+
+function SortIcon({ column, currentSortBy, currentSortOrder }: { column: string, currentSortBy: string, currentSortOrder: string }) {
+  if (currentSortBy !== column) {
+    return <ArrowUpDown className="w-3.5 h-3.5 opacity-40 ml-1 inline-block" />
+  }
+  return currentSortOrder === 'asc' 
+    ? <ArrowUp className="w-3.5 h-3.5 text-[var(--blue)] ml-1 inline-block" />
+    : <ArrowDown className="w-3.5 h-3.5 text-[var(--blue)] ml-1 inline-block" />
+}
+
+export default async function VentasPage({ searchParams }: PageProps) {
+  const { sortBy = 'fecha_emision', sortOrder = 'desc' } = await searchParams
   const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,7 +58,7 @@ export default async function VentasPage() {
   const { data: cotizaciones } = await supabase
     .from('cotizaciones')
     .select('*, leads(nombre, razon_social)')
-    .order('fecha_emision', { ascending: false })
+    .order(sortBy, { ascending: sortOrder === 'asc' })
 
   const { data: leads } = await supabase
     .from('leads')
@@ -79,11 +106,31 @@ export default async function VentasPage() {
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
               <tr>
-                <th className="px-6 py-4 font-medium">Cotización / Cliente</th>
-                <th className="px-6 py-4 font-medium">Fecha</th>
-                <th className="px-6 py-4 font-medium">Total</th>
-                <th className="px-6 py-4 font-medium">Estado</th>
-                <th className="px-6 py-4 font-medium text-right">Acciones</th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'numero')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Cotización / Cliente
+                    <SortIcon column="numero" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'fecha_emision')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Fecha
+                    <SortIcon column="fecha_emision" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'total')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Total
+                    <SortIcon column="total" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'estado')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Estado
+                    <SortIcon column="estado" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium text-right select-none">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--line-soft)]">
@@ -106,7 +153,7 @@ export default async function VentasPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-[var(--fg-dim)]">
-                      {format(new Date(cot.fecha_emision), 'MMM d, yyyy', { locale: es })}
+                      {format(new Date(cot.fecha_emision + 'T12:00:00'), 'MMM d, yyyy', { locale: es })}
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-[#4ade80] font-mono font-medium">{formatCOP(cot.total)}</div>
@@ -116,8 +163,13 @@ export default async function VentasPage() {
                         {cot.estado}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-1">
                       <DetalleCotizacionModal cotizacion={cot} />
+                      <BotonEliminar 
+                        id={cot.id} 
+                        action={eliminarCotizacion} 
+                        confirmMessage={`¿Estás seguro de que deseas eliminar la cotización ${cot.numero}?`} 
+                      />
                     </td>
                   </tr>
                 ))

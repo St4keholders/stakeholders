@@ -98,3 +98,32 @@ export async function actualizarProveedor(id: string, formData: FormData) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+
+export async function eliminarProveedor(id: string) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    const { error } = await supabase.from('proveedores').delete().eq('id', id)
+    if (error) {
+      if (error.code === '23503') {
+        return { ok: false, error: 'No se puede eliminar este proveedor porque tiene compras asociadas.' }
+      }
+      throw error
+    }
+
+    revalidatePath('/admin/proveedores')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al eliminar proveedor:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}

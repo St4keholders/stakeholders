@@ -1,12 +1,39 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { Truck, Plus, Search, Filter } from 'lucide-react'
+import { Truck, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NuevoProveedorModal } from '@/components/admin/proveedores/NuevoProveedorModal'
 import { DetalleProveedorModal } from '@/components/admin/proveedores/DetalleProveedorModal'
+import { BotonEliminar } from '@/components/admin/BotonEliminar'
+import { eliminarProveedor } from '@/app/admin/_actions/proveedores'
+import Link from 'next/link'
 
-export default async function ProveedoresPage() {
+interface PageProps {
+  searchParams: Promise<{
+    sortBy?: string
+    sortOrder?: 'asc' | 'desc'
+  }>
+}
+
+function getSortLink(currentSortBy: string, currentSortOrder: string, column: string) {
+  if (currentSortBy === column) {
+    return `?sortBy=${column}&sortOrder=${currentSortOrder === 'asc' ? 'desc' : 'asc'}`
+  }
+  return `?sortBy=${column}&sortOrder=asc`
+}
+
+function SortIcon({ column, currentSortBy, currentSortOrder }: { column: string, currentSortBy: string, currentSortOrder: string }) {
+  if (currentSortBy !== column) {
+    return <ArrowUpDown className="w-3.5 h-3.5 opacity-40 ml-1 inline-block" />
+  }
+  return currentSortOrder === 'asc' 
+    ? <ArrowUp className="w-3.5 h-3.5 text-[var(--blue)] ml-1 inline-block" />
+    : <ArrowDown className="w-3.5 h-3.5 text-[var(--blue)] ml-1 inline-block" />
+}
+
+export default async function ProveedoresPage({ searchParams }: PageProps) {
+  const { sortBy = 'created_at', sortOrder = 'desc' } = await searchParams
   const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,7 +50,7 @@ export default async function ProveedoresPage() {
   const { data: proveedores } = await supabase
     .from('proveedores')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order(sortBy, { ascending: sortOrder === 'asc' })
 
   return (
     <>
@@ -59,11 +86,26 @@ export default async function ProveedoresPage() {
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
               <tr>
-                <th className="px-6 py-4 font-medium">Razón Social</th>
-                <th className="px-6 py-4 font-medium">NIT / RUT</th>
-                <th className="px-6 py-4 font-medium">Contacto</th>
-                <th className="px-6 py-4 font-medium">Servicio/Producto</th>
-                <th className="px-6 py-4 font-medium text-right">Acciones</th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'razon_social')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Razón Social
+                    <SortIcon column="razon_social" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'nit_rut')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    NIT / RUT
+                    <SortIcon column="nit_rut" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium select-none">Contacto</th>
+                <th className="px-6 py-4 font-medium">
+                  <Link href={getSortLink(sortBy, sortOrder, 'tipo_servicio_producto')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
+                    Servicio/Producto
+                    <SortIcon column="tipo_servicio_producto" currentSortBy={sortBy} currentSortOrder={sortOrder} />
+                  </Link>
+                </th>
+                <th className="px-6 py-4 font-medium text-right select-none">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--line-soft)]">
@@ -97,8 +139,13 @@ export default async function ProveedoresPage() {
                         {prov.tipo_servicio_producto || 'No especificado'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-1">
                       <DetalleProveedorModal proveedor={prov} />
+                      <BotonEliminar 
+                        id={prov.id} 
+                        action={eliminarProveedor} 
+                        confirmMessage={`¿Estás seguro de que deseas eliminar al proveedor "${prov.razon_social}"?`} 
+                      />
                     </td>
                   </tr>
                 ))

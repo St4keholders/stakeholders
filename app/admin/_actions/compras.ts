@@ -135,3 +135,29 @@ export async function actualizarCompra(id: string, formData: FormData) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+
+export async function eliminarCompra(id: string) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    const { error } = await supabase.from('compras').delete().eq('id', id)
+    if (error) throw error
+
+    revalidatePath('/admin/compras')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al eliminar compra:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}

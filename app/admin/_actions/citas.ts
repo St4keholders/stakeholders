@@ -84,3 +84,28 @@ export async function actualizarCita(id: string, formData: FormData) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+
+export async function eliminarCita(id: string) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    const { error } = await supabase.from('consultas').delete().eq('id', id)
+    if (error) throw error
+
+    revalidatePath('/admin/citas')
+    revalidatePath('/admin/inicio')
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al eliminar cita:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}
