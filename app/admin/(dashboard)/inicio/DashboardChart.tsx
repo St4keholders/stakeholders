@@ -11,7 +11,7 @@ type FlujoData = {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#111114] border border-[rgba(255,255,255,0.08)] p-3 rounded-lg shadow-xl">
+      <div className="bg-[var(--bg-elevated)] border border-[var(--line-soft)] p-3 rounded-lg shadow-xl">
         <p className="text-[var(--fg-dim)] text-xs mb-2 font-mono uppercase tracking-wider">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2 text-sm font-medium">
@@ -43,7 +43,7 @@ export default function DashboardChart({ data }: { data: FlujoData[] }) {
     <div className="w-full h-[420px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={formattedData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--line-soft)" vertical={false} />
           <XAxis 
             dataKey="diaFormato" 
             stroke="#6b6b66" 

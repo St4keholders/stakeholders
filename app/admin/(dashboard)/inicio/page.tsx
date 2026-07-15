@@ -131,7 +131,7 @@ export default async function DashboardPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-md">
           <div className="flex justify-between items-start mb-4">
             <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Total Leads</div>
             <div className="w-8 h-8 rounded-lg bg-[var(--blue-dim)] text-[var(--blue)] flex items-center justify-center">
@@ -146,7 +146,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-md">
           <div className="flex justify-between items-start mb-4">
             <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Ingresos del Mes</div>
             <div className="w-8 h-8 rounded-lg bg-[#16a34a1a] text-[#4ade80] flex items-center justify-center">
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-md">
           <div className="flex justify-between items-start mb-4">
             <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Citas para Hoy</div>
             <div className="w-8 h-8 rounded-lg bg-[#fbbf241a] text-[#fbbf24] flex items-center justify-center">
@@ -176,7 +176,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 transition-colors flex flex-col justify-between shadow-md">
           <div className="flex justify-between items-start mb-4">
             <div className="text-[0.8rem] text-[var(--fg-dim)] font-medium">Costos del Mes</div>
             <div className="w-8 h-8 rounded-lg bg-[#f871711a] text-[#f87171] flex items-center justify-center">
@@ -194,7 +194,7 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4 mb-6">
         {/* Gráfico Principal */}
-        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 shadow-md">
           <div className="flex justify-between items-baseline mb-6">
             <div>
               <div className="font-sans text-lg font-medium text-[var(--fg)] mb-1">
@@ -211,7 +211,7 @@ export default async function DashboardPage() {
           <DashboardCalendar citasMes={citasMes} />
 
           {/* Top Cotizaciones */}
-          <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 flex-1 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+          <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 flex-1 shadow-md">
             <div className="font-sans text-[0.8rem] font-medium flex items-center gap-2 mb-4 text-[var(--fg-dim)]">
               <TrendingUp className="w-4 h-4 text-[var(--blue)]" /> Top Cotizaciones del Mes
             </div>
@@ -241,7 +241,7 @@ export default async function DashboardPage() {
       {/* Top Compras en row extra si quisiéramos, pero según plan va en el lateral. Para no amontonar lo pongo debajo como widget */}
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
         <div></div>
-        <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 shadow-md">
           <div className="font-sans text-[0.8rem] font-medium flex items-center gap-2 mb-4 text-[var(--fg-dim)]">
             <TrendingDown className="w-4 h-4 text-[var(--blue)]" /> Top Compras del Mes
           </div>

@@ -85,7 +85,7 @@ export function AdminSidebar({ user }: { user: UserProps }) {
       `}>
         <div className="px-6 pb-6 flex items-center gap-3 border-b border-[var(--line-soft)] mb-2 animate-in-stagger" style={{ animationDelay: '0ms' }}>
         <div className="w-12 h-12 flex items-center justify-center shrink-0">
-          <img src="/logo-nexo.png" alt="Stakeholders Logo" className="w-full h-full object-contain" />
+          <img src="/logo-nexo.png" alt="Stakeholders Logo" className="w-full h-full object-contain admin-logo" />
         </div>
         <div>
           <div className="font-serif italic text-lg leading-tight text-[var(--fg)]">Stakeholders</div>

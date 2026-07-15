@@ -41,6 +41,10 @@
   --blue-dim: rgba(59, 102, 223, 0.08);
 }
 
+.light .admin-logo {
+  filter: invert(1);
+}
+
 @keyframes animateIn {
   from {
     opacity: 0;

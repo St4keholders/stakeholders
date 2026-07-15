@@ -83,7 +83,7 @@ export default async function CitasPage({ searchParams }: PageProps) {
         <NuevaCitaModal />
       </div>
 
-      <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+      <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden shadow-md">
         <div className="p-6 mb-2 flex gap-4 items-center">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--fg-dim)]" />
@@ -101,7 +101,7 @@ export default async function CitasPage({ searchParams }: PageProps) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.04)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
+            <thead className="bg-[var(--bg-raise)] border-b border-[var(--line-soft)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
               <tr>
                 <th className="px-6 py-4 font-medium">
                   <Link href={getSortLink(sortBy, sortOrder, 'fecha_consulta')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
@@ -125,10 +125,10 @@ export default async function CitasPage({ searchParams }: PageProps) {
                 <th className="px-6 py-4 font-medium text-right select-none">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(255,255,255,0.02)]">
+            <tbody className="divide-y divide-[var(--line-soft)]">
               {citas && citas.length > 0 ? (
                 citas.map((cita) => (
-                  <tr key={cita.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
+                  <tr key={cita.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-[var(--blue-dim)] text-[var(--blue)] flex items-center justify-center">

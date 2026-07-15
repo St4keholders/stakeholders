@@ -93,7 +93,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.04)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
+            <thead className="bg-[var(--bg-raise)] border-b border-[var(--line-soft)] text-[0.75rem] font-medium text-[var(--fg-dim)]">
               <tr>
                 <th className="px-6 py-4 font-medium">
                   <Link href={getSortLink(sortBy, sortOrder, 'nombre')} className="flex items-center gap-1 hover:text-[var(--fg)] transition-colors select-none">
@@ -117,10 +117,10 @@ export default async function LeadsPage({ searchParams }: PageProps) {
                 <th className="px-6 py-4 font-medium text-right select-none">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(255,255,255,0.02)]">
+            <tbody className="divide-y divide-[var(--line-soft)]">
               {leads && leads.length > 0 ? (
                 leads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors group">
+                  <tr key={lead.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-[var(--blue-dim)] text-[var(--blue)] flex items-center justify-center font-semibold text-[0.85rem]">

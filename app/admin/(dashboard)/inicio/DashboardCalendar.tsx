@@ -33,7 +33,7 @@ export default function DashboardCalendar({ citasMes }: { citasMes: string[] }) 
   }
 
   return (
-    <div className="bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.5)] w-full">
+    <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-6 shadow-md w-full">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-serif italic text-[var(--blue)] text-lg">
           {format(currentDate, 'MMMM', { locale: es }).replace(/^\w/, c => c.toUpperCase())}{' '}
