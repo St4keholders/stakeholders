@@ -250,10 +250,9 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
               <table className="w-full text-left text-sm whitespace-nowrap">
                 <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.72rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
                   <tr>
-                    <th className="px-6 py-4 font-medium">Asiento / Concepto</th>
+                    <th className="px-6 py-4 font-medium">Cuenta Contable</th>
                     <th className="px-6 py-4 font-medium">Fecha</th>
                     <th className="px-6 py-4 font-medium">Tipo</th>
-                    <th className="px-6 py-4 font-medium">Cuenta Contable</th>
                     <th className="px-6 py-4 font-medium">Tercero</th>
                     <th className="px-6 py-4 font-medium text-right">Débito</th>
                     <th className="px-6 py-4 font-medium text-right">Crédito</th>
@@ -267,7 +266,7 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
                       // Retornamos la cabecera y luego las líneas de movimientos aplanadas
                       return [
                         <tr key={`header-${comp.id}`} className="bg-[rgba(77,127,255,0.02)] select-none">
-                          <td colSpan={7} className="px-6 py-3 border-b border-[var(--line-soft)]">
+                          <td colSpan={6} className="px-6 py-3 border-b border-[var(--line-soft)]">
                             <div className="flex justify-between items-center w-full">
                               <div className="flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-[var(--blue)]" />
@@ -293,16 +292,7 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
 
                           return (
                             <tr key={linea.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors">
-                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs pl-10 font-mono italic">
-                                —
-                              </td>
-                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs">
-                                {format(new Date(comp.fecha + 'T12:00:00'), 'MMM d, yyyy', { locale: es })}
-                              </td>
-                              <td className="px-6 py-3 text-[var(--fg-dim)] font-mono text-[0.72rem]">
-                                {tipoComprobanteEtiquetas[comp.tipo] || comp.tipo}
-                              </td>
-                              <td className="px-6 py-3 font-medium">
+                              <td className="px-6 py-3 font-medium pl-10">
                                 <Link 
                                   href={`/admin/contabilidad?tab=t&cuenta=${linea.cuenta_codigo}`}
                                   className="text-[var(--blue)] hover:underline flex items-center gap-1.5"
@@ -310,6 +300,12 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
                                   <BookOpen className="w-3 h-3 shrink-0" />
                                   {nombreCuenta}
                                 </Link>
+                              </td>
+                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs">
+                                {format(new Date(comp.fecha + 'T12:00:00'), 'MMM d, yyyy', { locale: es })}
+                              </td>
+                              <td className="px-6 py-3 text-[var(--fg-dim)] font-mono text-[0.72rem]">
+                                {tipoComprobanteEtiquetas[comp.tipo] || comp.tipo}
                               </td>
                               <td className="px-6 py-3 text-[var(--fg-dim)] text-xs truncate max-w-[150px]">
                                 {linea.tercero_id ? (tercerosMap[linea.tercero_id] || 'Tercero') : '—'}
@@ -327,7 +323,7 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-[var(--fg-dim)] italic">
+                      <td colSpan={6} className="px-6 py-12 text-center text-[var(--fg-dim)] italic">
                         No se encontraron comprobantes registrados en el rango o filtros seleccionados.
                       </td>
                     </tr>
