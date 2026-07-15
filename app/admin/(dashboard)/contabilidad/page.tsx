@@ -261,15 +261,17 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
                 </thead>
                 <tbody className="divide-y divide-[var(--line-soft)]">
                   {comprobantesFiltrados.length > 0 ? (
-                    comprobantesFiltrados.map((comp) => {
+                    comprobantesFiltrados.flatMap((comp) => {
                       const lineas = comp.movimientos || []
-                      return (
-                        <tr key={comp.id} className="hover:bg-[rgba(255,255,255,0.01)] transition-colors">
-                          <td colSpan={7} className="p-0">
-                            <div className="bg-[rgba(77,127,255,0.01)] px-6 py-3 border-b border-[var(--line-soft)] flex justify-between items-center">
+                      
+                      // Retornamos la cabecera y luego las líneas de movimientos aplanadas
+                      return [
+                        <tr key={`header-${comp.id}`} className="bg-[rgba(77,127,255,0.02)] select-none">
+                          <td colSpan={7} className="px-6 py-3 border-b border-[var(--line-soft)]">
+                            <div className="flex justify-between items-center w-full">
                               <div className="flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-[var(--blue)]" />
-                                <span className="font-medium text-[var(--fg)]">{comp.concepto}</span>
+                                <span className="font-semibold text-[var(--fg)] text-sm">{comp.concepto}</span>
                                 {comp.origen_modulo && comp.origen_id && (
                                   <Link
                                     href={`/admin/contabilidad?tab=diario&verModulo=${comp.origen_modulo}&verId=${comp.origen_id}${fechaInicio ? `&fechaInicio=${fechaInicio}` : ''}${fechaFin ? `&fechaFin=${fechaFin}` : ''}${tipoComprobante ? `&tipoComprobante=${tipoComprobante}` : ''}`}
@@ -283,47 +285,45 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
                                 Ref: {comp.id.substring(0, 8)}
                               </span>
                             </div>
-                            <table className="w-full text-xs">
-                              <tbody>
-                                {lineas.map((linea: any, lIdx: number) => {
-                                  const cuentaInfo = cuentasMap[linea.cuenta_codigo]
-                                  const nombreCuenta = cuentaInfo ? `${linea.cuenta_codigo} - ${cuentaInfo.nombre}` : linea.cuenta_codigo
-
-                                  return (
-                                    <tr key={linea.id} className="border-b border-[var(--line-soft)]/40 last:border-b-0 hover:bg-[rgba(255,255,255,0.015)]">
-                                      <td className="px-6 py-3 w-[30%] text-[var(--fg-dim)]"></td>
-                                      <td className="px-6 py-3 w-[12%] text-[var(--fg-dim)]">
-                                        {format(new Date(comp.fecha + 'T12:00:00'), 'MMM d, yyyy', { locale: es })}
-                                      </td>
-                                      <td className="px-6 py-3 w-[12%] text-[var(--fg-dim)] font-mono text-[0.72rem]">
-                                        {tipoComprobanteEtiquetas[comp.tipo] || comp.tipo}
-                                      </td>
-                                      <td className="px-6 py-3 w-[20%] font-medium">
-                                        <Link 
-                                          href={`/admin/contabilidad?tab=t&cuenta=${linea.cuenta_codigo}`}
-                                          className="text-[var(--blue)] hover:underline flex items-center gap-1.5"
-                                        >
-                                          <BookOpen className="w-3 h-3 shrink-0" />
-                                          {nombreCuenta}
-                                        </Link>
-                                      </td>
-                                      <td className="px-6 py-3 w-[16%] text-[var(--fg-dim)] truncate max-w-[150px]">
-                                        {linea.tercero_id ? (tercerosMap[linea.tercero_id] || 'Tercero desconocido') : '—'}
-                                      </td>
-                                      <td className="px-6 py-3 w-[10%] text-right font-mono font-medium text-[var(--fg)]">
-                                        {linea.debito > 0 ? formatCOP(linea.debito) : '—'}
-                                      </td>
-                                      <td className="px-6 py-3 w-[10%] text-right font-mono font-medium text-[var(--fg)]">
-                                        {linea.credito > 0 ? formatCOP(linea.credito) : '—'}
-                                      </td>
-                                    </tr>
-                                  )
-                                })}
-                              </tbody>
-                            </table>
                           </td>
-                        </tr>
-                      )
+                        </tr>,
+                        ...lineas.map((linea: any) => {
+                          const cuentaInfo = cuentasMap[linea.cuenta_codigo]
+                          const nombreCuenta = cuentaInfo ? `${linea.cuenta_codigo} - ${cuentaInfo.nombre}` : linea.cuenta_codigo
+
+                          return (
+                            <tr key={linea.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors">
+                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs pl-10 font-mono italic">
+                                —
+                              </td>
+                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs">
+                                {format(new Date(comp.fecha + 'T12:00:00'), 'MMM d, yyyy', { locale: es })}
+                              </td>
+                              <td className="px-6 py-3 text-[var(--fg-dim)] font-mono text-[0.72rem]">
+                                {tipoComprobanteEtiquetas[comp.tipo] || comp.tipo}
+                              </td>
+                              <td className="px-6 py-3 font-medium">
+                                <Link 
+                                  href={`/admin/contabilidad?tab=t&cuenta=${linea.cuenta_codigo}`}
+                                  className="text-[var(--blue)] hover:underline flex items-center gap-1.5"
+                                >
+                                  <BookOpen className="w-3 h-3 shrink-0" />
+                                  {nombreCuenta}
+                                </Link>
+                              </td>
+                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs truncate max-w-[150px]">
+                                {linea.tercero_id ? (tercerosMap[linea.tercero_id] || 'Tercero') : '—'}
+                              </td>
+                              <td className="px-6 py-3 text-right font-mono font-medium text-[var(--fg)] text-xs">
+                                {linea.debito > 0 ? formatCOP(linea.debito) : '—'}
+                              </td>
+                              <td className="px-6 py-3 text-right font-mono font-medium text-[var(--fg)] text-xs">
+                                {linea.credito > 0 ? formatCOP(linea.credito) : '—'}
+                              </td>
+                            </tr>
+                          )
+                        })
+                      ]
                     })
                   ) : (
                     <tr>
