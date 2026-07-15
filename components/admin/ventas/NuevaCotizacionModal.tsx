@@ -200,6 +200,24 @@ export function NuevaCotizacionModal({ leads = [] }: NuevaCotizacionModalProps) 
 
           <div className="w-full flex flex-col gap-1.5">
             <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
+              Tipo de Ingreso (Contabilidad)
+            </label>
+            <select
+              name="cuenta_ingreso"
+              defaultValue="415515"
+              className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] focus:border-[var(--blue)] rounded-xl px-4 py-2.5 text-sm outline-none text-[var(--fg)] transition-all"
+            >
+              <option value="415515">Desarrollos (Sitios web, automatizaciones) - 415515</option>
+              <option value="415530">Contabilidades (Manejo de contabilidades) - 415530</option>
+              <option value="415535">Honorarios (Asesoramiento de gestión) - 415535</option>
+              <option value="415540">Asesorías urbanas (Act. técnicas) - 415540</option>
+              <option value="421005">Inversiones (Financieros - Intereses) - 421005</option>
+              <option value="429595">Ingresos no esperados (Diversos) - 429595</option>
+            </select>
+          </div>
+
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
               Notas adicionales
             </label>
             <textarea

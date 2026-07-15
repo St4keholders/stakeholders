@@ -102,7 +102,8 @@ export async function crearCotizacion(formData: FormData) {
         monto_pagado: 0,
         estado: 'borrador',
         moneda: 'COP',
-        notas: notas || ''
+        notas: notas || '',
+        cuenta_ingreso: formData.get('cuenta_ingreso') as string || '415515'
       })
       .select('id')
       .single()

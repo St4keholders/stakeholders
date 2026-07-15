@@ -27,6 +27,15 @@ export function DetalleCotizacionModal({ cotizacion }: DetalleCotizacionModalPro
     'vencida': 'text-amber-400 bg-amber-400/10 border border-amber-400/20',
   }
 
+  const cuentasNombres: Record<string, string> = {
+    '415515': 'Desarrollos (415515)',
+    '415530': 'Contabilidades (415530)',
+    '415535': 'Honorarios (415535)',
+    '415540': 'Asesorías urbanas (415540)',
+    '421005': 'Inversiones (421005)',
+    '429595': 'Ingresos no esperados (429595)',
+  }
+
   function formatCOP(n: number) {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -139,6 +148,15 @@ export function DetalleCotizacionModal({ cotizacion }: DetalleCotizacionModalPro
                   <p className="text-[var(--fg)] font-medium bg-[rgba(255,255,255,0.02)] p-3 rounded-lg border border-[var(--line-soft)] text-sm">
                     {cotizacion.notas}
                   </p>
+              </div>
+            )}
+
+            {cotizacion.cuenta_ingreso && !isEditing && (
+              <div className="mt-4 pt-4 border-t border-[var(--line-soft)]">
+                <p className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)] mb-1">Tipo de Ingreso (Contabilidad)</p>
+                <p className="text-[var(--fg)] font-medium bg-[rgba(255,255,255,0.02)] px-3 py-2 rounded-lg border border-[var(--line-soft)] text-xs font-mono inline-block">
+                  {cuentasNombres[cotizacion.cuenta_ingreso] || cotizacion.cuenta_ingreso}
+                </p>
               </div>
             )}
           </div>

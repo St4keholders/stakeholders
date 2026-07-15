@@ -80,7 +80,9 @@ export async function registrarCompra(formData: FormData) {
       retencion_total: 0,
       total: total,
       monto_pagado: 0,
-      estado: 'pendiente'
+      estado: 'pendiente',
+      cuenta_gasto: formData.get('cuenta_gasto') as string || '615540',
+      cuenta_contrapartida: formData.get('cuenta_contrapartida') as string || '220505'
     })
 
     if (errCompra) throw errCompra

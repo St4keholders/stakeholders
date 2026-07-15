@@ -23,6 +23,23 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
     'anulada': 'text-zinc-400 bg-zinc-400/10 border border-zinc-400/20',
   }
 
+  const gastoNombres: Record<string, string> = {
+    '615540': 'Costo de servicios prestados (615540)',
+    '511035': 'Honorarios — Asesoría técnica (511035)',
+    '512010': 'Arrendamientos (512010)',
+    '513535': 'Servicios — Teléfono / Internet (513535)',
+    '519530': 'Diversos — Útiles y papelería (519530)',
+    '519910': 'Provisiones — Deudores (519910)',
+    '530505': 'Financieros — Gastos bancarios (530505)',
+  }
+
+  const contrapartidaNombres: Record<string, string> = {
+    '220505': 'Proveedores nacionales (220505)',
+    '233525': 'Honorarios por pagar (233525)',
+    '233530': 'Servicios técnicos por pagar (233530)',
+    '233595': 'Otros costos y gastos por pagar (233595)',
+  }
+
   function formatCOP(n: number) {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -128,6 +145,23 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
                 )}
               </div>
             </div>
+
+            {!isEditing && (compra.cuenta_gasto || compra.cuenta_contrapartida) && (
+              <div className="mt-4 pt-4 border-t border-[var(--line-soft)] grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)] mb-1">Naturaleza (Costo/Gasto)</p>
+                  <p className="text-[var(--fg)] font-medium text-xs font-mono bg-[rgba(255,255,255,0.02)] p-2.5 rounded-lg border border-[var(--line-soft)]">
+                    {gastoNombres[compra.cuenta_gasto] || compra.cuenta_gasto || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)] mb-1">Contrapartida (Pasivo)</p>
+                  <p className="text-[var(--fg)] font-medium text-xs font-mono bg-[rgba(255,255,255,0.02)] p-2.5 rounded-lg border border-[var(--line-soft)]">
+                    {contrapartidaNombres[compra.cuenta_contrapartida] || compra.cuenta_contrapartida || 'N/A'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-[#0a0a0a] border border-[var(--line-soft)] rounded-xl p-4">

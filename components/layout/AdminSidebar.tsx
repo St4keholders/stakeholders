@@ -15,6 +15,7 @@ import {
   CreditCard
 } from '@/components/ui/CoolIcons'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { BookOpen } from 'lucide-react'
 
 interface UserProps {
   nombre: string
@@ -102,7 +103,8 @@ export function AdminSidebar({ user }: { user: UserProps }) {
         <NavLink href="/admin/ventas" icon={DollarSign} label="Ventas" index={6} />
         <NavLink href="/admin/compras" icon={ShoppingCart} label="Compras" index={7} />
         <NavLink href="/admin/tesoreria" icon={CreditCard} label="Tesorería" index={8} />
-        <NavLink href="/admin/proveedores" icon={Users} label="Proveedores" index={9} />
+        <NavLink href="/admin/contabilidad" icon={BookOpen} label="Contabilidad" index={9} />
+        <NavLink href="/admin/proveedores" icon={Users} label="Proveedores" index={10} />
 
         <div className="px-6 pt-5 pb-1 font-mono text-[0.62rem] tracking-[0.28em] uppercase text-[var(--fg-dim-2)] font-semibold animate-in-stagger" style={{ animationDelay: '400ms' }}>Sistema</div>
         <NavLink href="/admin/kpis" icon={Activity} label="KPIs" index={11} />

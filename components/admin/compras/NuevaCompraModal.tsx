@@ -96,6 +96,42 @@ export function NuevaCompraModal({ proveedores = [] }: NuevaCompraModalProps) {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
+                Naturaleza (Costo/Gasto)
+              </label>
+              <select
+                name="cuenta_gasto"
+                defaultValue="615540"
+                className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] focus:border-[var(--blue)] rounded-xl px-4 py-2.5 text-sm outline-none text-[var(--fg)]"
+              >
+                <option value="615540">Costo de servicios prestados - 615540</option>
+                <option value="511035">Honorarios — Asesoría técnica - 511035</option>
+                <option value="512010">Arrendamientos - 512010</option>
+                <option value="513535">Servicios — Teléfono / Internet - 513535</option>
+                <option value="519530">Diversos — Útiles y papelería - 519530</option>
+                <option value="519910">Provisiones — Deudores - 519910</option>
+                <option value="530505">Financieros — Gastos bancarios - 530505</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
+                Contrapartida (Pasivo)
+              </label>
+              <select
+                name="cuenta_contrapartida"
+                defaultValue="220505"
+                className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] focus:border-[var(--blue)] rounded-xl px-4 py-2.5 text-sm outline-none text-[var(--fg)]"
+              >
+                <option value="220505">Proveedores nacionales - 220505</option>
+                <option value="233525">Honorarios por pagar - 233525</option>
+                <option value="233530">Servicios técnicos por pagar - 233530</option>
+                <option value="233595">Otros costos y gastos por pagar - 233595</option>
+              </select>
+            </div>
+          </div>
+
           <Input 
             label="Total (COP)" 
             name="total" 
