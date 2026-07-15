@@ -6,6 +6,7 @@ import { es } from 'date-fns/locale'
 import { ArrowUpDown, BookOpen, Calendar, DollarSign, Filter, Search, FileText, ArrowLeftRight, Check, X } from 'lucide-react'
 import { SelectorCuenta } from './SelectorCuenta'
 import { ModalDetalleTransaccion } from './ModalDetalleTransaccion'
+import { TablaLibroDiario } from './TablaLibroDiario'
 
 interface PageProps {
   searchParams: Promise<{
@@ -245,93 +246,15 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
           </div>
 
           {/* TABLA LIBRO DIARIO */}
-          <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[var(--line-soft)] text-[0.72rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Cuenta Contable</th>
-                    <th className="px-6 py-4 font-medium">Fecha</th>
-                    <th className="px-6 py-4 font-medium">Tipo</th>
-                    <th className="px-6 py-4 font-medium">Tercero</th>
-                    <th className="px-6 py-4 font-medium text-right">Débito</th>
-                    <th className="px-6 py-4 font-medium text-right">Crédito</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--line-soft)]">
-                  {comprobantesFiltrados.length > 0 ? (
-                    comprobantesFiltrados.flatMap((comp) => {
-                      const lineas = comp.movimientos || []
-                      
-                      // Retornamos la cabecera y luego las líneas de movimientos aplanadas
-                      return [
-                        <tr key={`header-${comp.id}`} className="bg-[rgba(77,127,255,0.02)] select-none">
-                          <td colSpan={6} className="px-6 py-3 border-b border-[var(--line-soft)]">
-                            <div className="flex justify-between items-center w-full">
-                              <div className="flex items-center gap-3">
-                                <div className="w-2 h-2 rounded-full bg-[var(--blue)]" />
-                                <span className="font-semibold text-[var(--fg)] text-sm">{comp.concepto}</span>
-                                {comp.origen_modulo && comp.origen_id && (
-                                  <Link
-                                    href={`/admin/contabilidad?tab=diario&verModulo=${comp.origen_modulo}&verId=${comp.origen_id}${fechaInicio ? `&fechaInicio=${fechaInicio}` : ''}${fechaFin ? `&fechaFin=${fechaFin}` : ''}${tipoComprobante ? `&tipoComprobante=${tipoComprobante}` : ''}`}
-                                    className="ml-2 font-mono text-[0.7rem] bg-[var(--blue-dim)] text-[var(--blue)] px-2 py-0.5 rounded hover:bg-[var(--blue)] hover:text-white transition-colors"
-                                  >
-                                    Ver Origen
-                                  </Link>
-                                )}
-                              </div>
-                              <span className="font-mono text-[0.72rem] text-[var(--fg-dim)] uppercase tracking-wider">
-                                Ref: {comp.id.substring(0, 8)}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>,
-                        ...lineas.map((linea: any) => {
-                          const cuentaInfo = cuentasMap[linea.cuenta_codigo]
-                          const nombreCuenta = cuentaInfo ? `${linea.cuenta_codigo} - ${cuentaInfo.nombre}` : linea.cuenta_codigo
-
-                          return (
-                            <tr key={linea.id} className="hover:bg-[rgba(255,255,255,0.015)] transition-colors">
-                              <td className="px-6 py-3 font-medium pl-10">
-                                <Link 
-                                  href={`/admin/contabilidad?tab=t&cuenta=${linea.cuenta_codigo}`}
-                                  className="text-[var(--blue)] hover:underline flex items-center gap-1.5"
-                                >
-                                  <BookOpen className="w-3 h-3 shrink-0" />
-                                  {nombreCuenta}
-                                </Link>
-                              </td>
-                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs">
-                                {format(new Date(comp.fecha + 'T12:00:00'), 'MMM d, yyyy', { locale: es })}
-                              </td>
-                              <td className="px-6 py-3 text-[var(--fg-dim)] font-mono text-[0.72rem]">
-                                {tipoComprobanteEtiquetas[comp.tipo] || comp.tipo}
-                              </td>
-                              <td className="px-6 py-3 text-[var(--fg-dim)] text-xs truncate max-w-[150px]">
-                                {linea.tercero_id ? (tercerosMap[linea.tercero_id] || 'Tercero') : '—'}
-                              </td>
-                              <td className="px-6 py-3 text-right font-mono font-medium text-[var(--fg)] text-xs">
-                                {linea.debito > 0 ? formatCOP(linea.debito) : '—'}
-                              </td>
-                              <td className="px-6 py-3 text-right font-mono font-medium text-[var(--fg)] text-xs">
-                                {linea.credito > 0 ? formatCOP(linea.credito) : '—'}
-                              </td>
-                            </tr>
-                          )
-                        })
-                      ]
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-[var(--fg-dim)] italic">
-                        No se encontraron comprobantes registrados en el rango o filtros seleccionados.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <TablaLibroDiario 
+            comprobantes={comprobantesFiltrados}
+            cuentasMap={cuentasMap}
+            tercerosMap={tercerosMap}
+            tipoComprobanteEtiquetas={tipoComprobanteEtiquetas}
+            fechaInicio={fechaInicio}
+            fechaFin={fechaFin}
+            tipoComprobante={tipoComprobante}
+          />
         </div>
       ) : (
         <div className="space-y-6 animate-fade-in">
