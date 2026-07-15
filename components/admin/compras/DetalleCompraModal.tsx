@@ -170,7 +170,7 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[var(--line-soft)] rounded-xl p-4">
+          <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-[var(--fg-dim)] text-sm">Subtotal</span>
               <span className="text-[var(--fg)]">{formatCOP(compra.subtotal)}</span>
