@@ -97,14 +97,24 @@ export default function NeuralCanvas() {
         inside = true;
       }
 
+      const isLight = typeof document !== 'undefined' && document.documentElement.classList.contains('light');
+      const baseColor = isLight ? '59, 102, 223' : '255, 255, 255';
+
       ctx.clearRect(0, 0, sys.w, sys.h);
 
       if (inside) {
         const halo = ctx.createRadialGradient(mx, my, 0, mx, my, MOUSE_RADIUS * 1.35);
-        halo.addColorStop(0, 'rgba(255,255,255,0.085)');
-        halo.addColorStop(0.35, 'rgba(255,255,255,0.035)');
-        halo.addColorStop(0.7, 'rgba(255,255,255,0.012)');
-        halo.addColorStop(1, 'rgba(255,255,255,0)');
+        if (isLight) {
+          halo.addColorStop(0, 'rgba(59, 102, 223, 0.045)');
+          halo.addColorStop(0.35, 'rgba(59, 102, 223, 0.02)');
+          halo.addColorStop(0.7, 'rgba(59, 102, 223, 0.006)');
+          halo.addColorStop(1, 'rgba(59, 102, 223, 0)');
+        } else {
+          halo.addColorStop(0, 'rgba(255,255,255,0.085)');
+          halo.addColorStop(0.35, 'rgba(255,255,255,0.035)');
+          halo.addColorStop(0.7, 'rgba(255,255,255,0.012)');
+          halo.addColorStop(1, 'rgba(255,255,255,0)');
+        }
         ctx.fillStyle = halo;
         ctx.fillRect(mx - MOUSE_RADIUS * 1.35, my - MOUSE_RADIUS * 1.35, MOUSE_RADIUS * 2.7, MOUSE_RADIUS * 2.7);
       }
@@ -132,7 +142,7 @@ export default function NeuralCanvas() {
             const fade = 1 - Math.sqrt(d2) / LINK_DIST;
             const o = (0.022 + heat * 0.34) * fade;
             if (o > 0.006) {
-              ctx.strokeStyle = `rgba(255,255,255,${o})`;
+              ctx.strokeStyle = `rgba(${baseColor},${isLight ? o * 0.4 : o})`;
               ctx.lineWidth = 1;
               ctx.beginPath();
               ctx.moveTo(a.x, a.y);
@@ -142,7 +152,7 @@ export default function NeuralCanvas() {
           }
         }
 
-        ctx.fillStyle = `rgba(255,255,255,${0.09 + heatA * 0.72})`;
+        ctx.fillStyle = `rgba(${baseColor},${isLight ? 0.07 + heatA * 0.4 : 0.09 + heatA * 0.72})`;
         ctx.beginPath();
         ctx.arc(a.x, a.y, a.r + heatA * 1.6, 0, Math.PI * 2);
         ctx.fill();

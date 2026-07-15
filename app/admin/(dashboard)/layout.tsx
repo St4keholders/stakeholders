@@ -44,7 +44,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="relative flex min-h-screen bg-[#050505] text-[var(--fg)] font-sans text-sm tracking-[0.01em] transition-colors duration-300">
+    <div className="relative flex min-h-screen bg-[var(--bg)] text-[var(--fg)] font-sans text-sm tracking-[0.01em] transition-colors duration-300">
       <div className="fixed inset-0 z-0 pointer-events-none opacity-30">
         <NeuralCanvas />
       </div>

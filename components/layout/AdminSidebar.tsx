@@ -49,7 +49,7 @@ export function AdminSidebar({ user }: { user: UserProps }) {
         className={`animate-in-stagger flex items-center gap-3 px-3 py-2.5 mx-3 mb-1 rounded-lg text-[0.82rem] font-medium transition-all duration-200 ease-out ${
           active 
             ? 'bg-[var(--fg)] text-[var(--bg)] shadow-md' 
-            : 'text-[var(--fg-dim)] hover:text-[var(--fg)] hover:bg-[rgba(255,255,255,0.03)]'
+            : 'text-[var(--fg-dim)] hover:text-[var(--fg)] hover:bg-[var(--line-soft)]'
         }`}
         style={{ animationDelay: `${index * 40}ms` }}
       >
@@ -64,7 +64,7 @@ export function AdminSidebar({ user }: { user: UserProps }) {
       {/* Mobile Menu Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-5 right-5 z-50 p-2.5 bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] rounded-xl text-[var(--fg)] shadow-2xl"
+        className="lg:hidden fixed top-5 right-5 z-50 p-2.5 bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl text-[var(--fg)] shadow-2xl"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
       </button>
@@ -79,7 +79,7 @@ export function AdminSidebar({ user }: { user: UserProps }) {
 
       <aside className={`
         fixed lg:sticky top-0 left-0 h-screen z-40
-        w-[240px] bg-[#050505] lg:bg-[rgba(255,255,255,0.01)] border-r border-[var(--line-soft)] flex flex-col py-6 shrink-0
+        w-[240px] bg-[var(--bg)] border-r border-[var(--line-soft)] flex flex-col py-6 shrink-0
         transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
