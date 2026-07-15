@@ -125,6 +125,7 @@ export function NuevaCompraModal({ proveedores = [] }: NuevaCompraModalProps) {
                     <option value="615540">Costo de servicios prestados - 615540</option>
                     <option value="615545">Costos de servidor - 615545</option>
                     <option value="615550">Costo de desarrollo - 615550</option>
+                    <option value="615555">Contratación de terceros - 615555</option>
                   </>
                 ) : (
                   <>

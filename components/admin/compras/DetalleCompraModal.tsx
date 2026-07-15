@@ -27,6 +27,7 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
     '615540': 'Costo de servicios prestados (615540)',
     '615545': 'Costos de servidor (615545)',
     '615550': 'Costo de desarrollo (615550)',
+    '615555': 'Costo por contratación de terceros (615555)',
     '510505': 'Gastos de administración (510505)',
     '519505': 'Gastos de ventas (519505)',
     '519595': 'Gastos por viáticos (519595)',
