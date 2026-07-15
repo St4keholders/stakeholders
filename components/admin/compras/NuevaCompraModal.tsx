@@ -14,6 +14,7 @@ export function NuevaCompraModal({ proveedores = [] }: NuevaCompraModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [tipoCompra, setTipoCompra] = useState<'costo' | 'gasto'>('costo')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -99,38 +100,53 @@ export function NuevaCompraModal({ proveedores = [] }: NuevaCompraModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
-                Naturaleza (Costo/Gasto)
+                Naturaleza
+              </label>
+              <select
+                value={tipoCompra}
+                onChange={(e) => setTipoCompra(e.target.value as 'costo' | 'gasto')}
+                className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] focus:border-[var(--blue)] rounded-xl px-4 py-2.5 text-sm outline-none text-[var(--fg)]"
+              >
+                <option value="costo">Costo</option>
+                <option value="gasto">Gasto</option>
+              </select>
+            </div>
+            
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
+                Concepto de la compra
               </label>
               <select
                 name="cuenta_gasto"
-                defaultValue="615540"
                 className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] focus:border-[var(--blue)] rounded-xl px-4 py-2.5 text-sm outline-none text-[var(--fg)]"
               >
-                <option value="615540">Costo de servicios prestados - 615540</option>
-                <option value="511035">Honorarios — Asesoría técnica - 511035</option>
-                <option value="512010">Arrendamientos - 512010</option>
-                <option value="513535">Servicios — Teléfono / Internet - 513535</option>
-                <option value="519530">Diversos — Útiles y papelería - 519530</option>
-                <option value="519910">Provisiones — Deudores - 519910</option>
-                <option value="530505">Financieros — Gastos bancarios - 530505</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">
-                Contrapartida (Pasivo)
-              </label>
-              <select
-                name="cuenta_contrapartida"
-                defaultValue="220505"
-                className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] focus:border-[var(--blue)] rounded-xl px-4 py-2.5 text-sm outline-none text-[var(--fg)]"
-              >
-                <option value="220505">Proveedores nacionales - 220505</option>
-                <option value="233525">Honorarios por pagar - 233525</option>
-                <option value="233530">Servicios técnicos por pagar - 233530</option>
-                <option value="233595">Otros costos y gastos por pagar - 233595</option>
+                {tipoCompra === 'costo' ? (
+                  <>
+                    <option value="615540">Costo de servicios prestados - 615540</option>
+                    <option value="615545">Costos de servidor - 615545</option>
+                    <option value="615550">Costo de desarrollo - 615550</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="510505">Gastos de administración - 510505</option>
+                    <option value="519505">Gastos de ventas - 519505</option>
+                    <option value="519595">Gastos por viáticos - 519595</option>
+                    <option value="511035">Honorarios — Asesoría técnica - 511035</option>
+                    <option value="512010">Arrendamientos - 512010</option>
+                    <option value="513535">Servicios — Teléfono / Internet - 513535</option>
+                    <option value="519530">Diversos — Útiles y papelería - 519530</option>
+                    <option value="530505">Financieros — Gastos bancarios - 530505</option>
+                  </>
+                )}
               </select>
             </div>
           </div>
+          
+          <input 
+            type="hidden" 
+            name="cuenta_contrapartida" 
+            value={tipoCompra === 'costo' ? '220505' : '233595'} 
+          />
 
           <Input 
             label="Total (COP)" 
