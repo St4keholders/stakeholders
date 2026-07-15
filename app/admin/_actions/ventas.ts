@@ -21,14 +21,34 @@ export async function crearCotizacion(formData: FormData) {
 
     const clienteNombre = formData.get('cliente') as string
     const fecha = formData.get('fecha') as string
-    const totalStr = formData.get('total') as string
+    const itemsStr = formData.get('items') as string
     const notas = formData.get('notas') as string
 
-    if (!clienteNombre || !fecha || !totalStr) {
+    if (!clienteNombre || !fecha || !itemsStr) {
       return { ok: false, error: 'Faltan campos obligatorios' }
     }
 
-    const total = parseFloat(totalStr)
+    let items: any[] = []
+    try {
+      items = JSON.parse(itemsStr)
+    } catch (e) {
+      return { ok: false, error: 'Los ítems de la cotización tienen un formato inválido' }
+    }
+
+    if (items.length === 0) {
+      return { ok: false, error: 'Debes agregar al menos un ítem o servicio a la cotización' }
+    }
+
+    // Validar y calcular total
+    let totalCalculado = 0
+    for (const item of items) {
+      const cantidad = parseFloat(item.cantidad)
+      const precio = parseFloat(item.precio_unitario)
+      if (isNaN(cantidad) || cantidad <= 0 || isNaN(precio) || precio < 0 || !item.descripcion) {
+        return { ok: false, error: 'Cada ítem debe tener descripción, cantidad y precio válidos' }
+      }
+      totalCalculado += cantidad * precio
+    }
     
     // 1. Buscar o crear el lead (cliente)
     let leadId = ''
@@ -68,22 +88,44 @@ export async function crearCotizacion(formData: FormData) {
     const valida_hasta = formData.get('valida_hasta') as string
 
     // 3. Crear la cotizacion
-    const { error: errVenta } = await supabase.from('cotizaciones').insert({
-      numero,
-      lead_id: leadId,
-      fecha_emision: fecha,
-      valida_hasta: valida_hasta || null,
-      subtotal: total, 
-      descuento_total: 0,
-      iva_total: 0,
-      total: total,
-      monto_pagado: 0,
-      estado: 'borrador',
-      moneda: 'COP',
-      notas: notas || ''
-    })
+    const { data: newVenta, error: errVenta } = await supabase
+      .from('cotizaciones')
+      .insert({
+        numero,
+        lead_id: leadId,
+        fecha_emision: fecha,
+        valida_hasta: valida_hasta || null,
+        subtotal: totalCalculado, 
+        descuento_total: 0,
+        iva_total: 0,
+        total: totalCalculado,
+        monto_pagado: 0,
+        estado: 'borrador',
+        moneda: 'COP',
+        notas: notas || ''
+      })
+      .select('id')
+      .single()
 
-    if (errVenta) throw errVenta
+    if (errVenta || !newVenta) throw errVenta || new Error('No se pudo crear la cotización')
+
+    // 4. Crear los ítems de la cotización
+    const lineas = items.map((item: any, index: number) => ({
+      cotizacion_id: newVenta.id,
+      orden: index,
+      descripcion: item.descripcion,
+      cantidad: parseFloat(item.cantidad),
+      precio_unitario: parseFloat(item.precio_unitario),
+      descuento_pct: 0,
+      iva_pct: 0,
+      subtotal: parseFloat(item.cantidad) * parseFloat(item.precio_unitario)
+    }))
+
+    const { error: errItems } = await supabase
+      .from('cotizacion_items')
+      .insert(lineas)
+
+    if (errItems) throw errItems
 
     revalidatePath('/admin/ventas')
     revalidatePath('/admin/inicio')

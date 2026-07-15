@@ -122,8 +122,27 @@ const styles = StyleSheet.create({
     fontSize: 11, 
     color: '#000000' 
   },
+  notasSection: {
+    marginTop: 30,
+    marginBottom: 10,
+    borderTop: '1px solid #e5e7eb',
+    paddingTop: 10,
+  },
+  notasTitle: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 10,
+    color: '#000000',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  notasText: {
+    fontFamily: 'Helvetica',
+    fontSize: 9,
+    color: '#333333',
+    lineHeight: 1.4,
+  },
   bankSection: {
-    marginTop: 60,
+    marginTop: 20,
   },
   bankTitle: {
     fontFamily: 'Helvetica-Bold',
@@ -202,12 +221,23 @@ export const CotizacionDocument = ({ data }: { data: any }) => {
             <Text style={[styles.colTotal, styles.textHeader]}>Total</Text>
           </View>
           
-          <View style={styles.tableRow}>
-            <Text style={[styles.colConcepto, styles.textCell]}>{data.notas || 'Servicios Profesionales de Diseño y Desarrollo'}</Text>
-            <Text style={[styles.colQty, styles.textCell]}>1</Text>
-            <Text style={[styles.colPrice, styles.textCell]}>{formatCOP(data.subtotal)}</Text>
-            <Text style={[styles.colTotal, styles.textCell]}>{formatCOP(data.subtotal)}</Text>
-          </View>
+          {data.cotizacion_items && data.cotizacion_items.length > 0 ? (
+            data.cotizacion_items.map((item: any, index: number) => (
+              <View key={item.id || index} style={styles.tableRow}>
+                <Text style={[styles.colConcepto, styles.textCell]}>{item.descripcion}</Text>
+                <Text style={[styles.colQty, styles.textCell]}>{Number(item.cantidad)}</Text>
+                <Text style={[styles.colPrice, styles.textCell]}>{formatCOP(Number(item.precio_unitario))}</Text>
+                <Text style={[styles.colTotal, styles.textCell]}>{formatCOP(Number(item.subtotal))}</Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.tableRow}>
+              <Text style={[styles.colConcepto, styles.textCell]}>{data.notas || 'Servicios Profesionales de Diseño y Desarrollo'}</Text>
+              <Text style={[styles.colQty, styles.textCell]}>1</Text>
+              <Text style={[styles.colPrice, styles.textCell]}>{formatCOP(data.subtotal)}</Text>
+              <Text style={[styles.colTotal, styles.textCell]}>{formatCOP(data.subtotal)}</Text>
+            </View>
+          )}
         </View>
 
         {/* Sección inferior (Pendiente y Totales) */}
@@ -233,6 +263,14 @@ export const CotizacionDocument = ({ data }: { data: any }) => {
             </View>
           </View>
         </View>
+
+        {/* Notas Adicionales (reubicada encima de la cuenta bancaria) */}
+        {data.notas ? (
+          <View style={styles.notasSection}>
+            <Text style={styles.notasTitle}>Notas Adicionales</Text>
+            <Text style={styles.notasText}>{data.notas}</Text>
+          </View>
+        ) : null}
 
         {/* Cuenta Bancaria */}
         <View style={styles.bankSection}>
