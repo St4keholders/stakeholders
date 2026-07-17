@@ -155,16 +155,17 @@ export async function actualizarCotizacion(id: string, formData: FormData) {
     const estado = formData.get('estado') as string
     const valida_hasta = formData.get('valida_hasta') as string
 
-    if (!estado) {
-      return { ok: false, error: 'Faltan campos obligatorios' }
+    const updateFields: any = {
+      valida_hasta: valida_hasta || null
+    }
+
+    if (estado) {
+      updateFields.estado = estado
     }
 
     const { error } = await supabase
       .from('cotizaciones')
-      .update({ 
-        estado,
-        valida_hasta: valida_hasta || null
-      })
+      .update(updateFields)
       .eq('id', id)
 
     if (error) throw error

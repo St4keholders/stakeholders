@@ -168,21 +168,9 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
                 <p className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">Proveedor</p>
                 <h3 className="text-[var(--fg)] font-medium text-lg mt-1">{compra.proveedores?.razon_social || 'Desconocido'}</h3>
               </div>
-              {!isEditing ? (
-                <span className={`px-2.5 py-1 rounded-full text-[0.75rem] font-medium ${estadoColors[compra.estado]}`}>
-                  {compra.estado.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                </span>
-              ) : (
-                <select
-                  name="estado"
-                  defaultValue={compra.estado}
-                  className="bg-[var(--bg-elevated)] border border-[var(--line-soft)] rounded-lg px-2 py-1 text-sm text-[var(--fg)] outline-none focus:border-[var(--blue)]"
-                >
-                  <option value="pendiente">Pendiente</option>
-                  <option value="pagada">Pagada</option>
-                  <option value="anulada">Anulada</option>
-                </select>
-              )}
+              <span className={`px-2.5 py-1 rounded-full text-[0.75rem] font-medium ${estadoColors[totalPagado >= compra.total ? 'pagada' : compra.estado === 'anulada' ? 'anulada' : 'pendiente']}`}>
+                {(totalPagado >= compra.total ? 'pagada' : compra.estado === 'anulada' ? 'anulada' : 'pendiente').replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </span>
             </div>
             
             <div className="grid grid-cols-2 gap-4">

@@ -114,16 +114,17 @@ export async function actualizarCompra(id: string, formData: FormData) {
     const estado = formData.get('estado') as string
     const fecha_vencimiento = formData.get('fecha_vencimiento') as string
 
-    if (!estado) {
-      return { ok: false, error: 'Faltan campos obligatorios' }
+    const updateFields: any = {
+      fecha_vencimiento: fecha_vencimiento || null
+    }
+
+    if (estado) {
+      updateFields.estado = estado
     }
 
     const { error } = await supabase
       .from('compras')
-      .update({ 
-        estado,
-        fecha_vencimiento: fecha_vencimiento || null
-      })
+      .update(updateFields)
       .eq('id', id)
 
     if (error) throw error

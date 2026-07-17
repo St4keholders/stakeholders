@@ -170,20 +170,19 @@ export function DetalleCotizacionModal({ cotizacion }: DetalleCotizacionModalPro
                 <p className="text-[0.75rem] font-mono uppercase tracking-wider text-[var(--fg-dim)]">Cliente / Lead</p>
                 <h3 className="text-[var(--fg)] font-medium text-lg mt-1">{cotizacion.leads?.nombre || 'Desconocido'}</h3>
               </div>
-              {!isEditing ? (
-                <span className={`px-2.5 py-1 rounded-full text-[0.75rem] font-medium ${estadoColors[cotizacion.estado]}`}>
-                  {cotizacion.estado.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              {!isEditing || totalPagado >= cotizacion.total ? (
+                <span className={`px-2.5 py-1 rounded-full text-[0.75rem] font-medium ${estadoColors[totalPagado >= cotizacion.total ? 'pagada' : totalPagado > 0 ? 'aceptada' : cotizacion.estado]}`}>
+                  {(totalPagado >= cotizacion.total ? 'pagada' : totalPagado > 0 ? 'aceptada' : cotizacion.estado).replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 </span>
               ) : (
                 <select
                   name="estado"
-                  defaultValue={cotizacion.estado}
+                  defaultValue={totalPagado > 0 ? 'aceptada' : cotizacion.estado}
                   className="bg-[var(--bg-elevated)] border border-[var(--line-soft)] rounded-lg px-2 py-1 text-sm text-[var(--fg)] outline-none focus:border-[var(--blue)]"
                 >
                   <option value="borrador">Borrador</option>
                   <option value="enviada">Enviada</option>
                   <option value="aceptada">Aceptada</option>
-                  <option value="pagada">Pagada</option>
                   <option value="rechazada">Rechazada</option>
                   <option value="vencida">Vencida</option>
                 </select>
