@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Download, Loader2, Plus, Trash2, CreditCard } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { actualizarCompra } from '@/app/admin/_actions/compras'
-import { Loader2 } from 'lucide-react'
+import { actualizarCompra, registrarPagoCompra, eliminarPagoCompra } from '@/app/admin/_actions/compras'
+import { createClient } from '@/lib/supabase/client'
 
 interface DetalleCompraModalProps {
   compra: any
@@ -16,6 +17,77 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Estados para abonos
+  const [pagos, setPagos] = useState<any[]>([])
+  const [cargandoPagos, setCargandoPagos] = useState(false)
+  const [mostrarFormAbono, setMostrarFormAbono] = useState(false)
+  const [montoAbono, setMontoAbono] = useState('')
+  const [metodoAbono, setMetodoAbono] = useState('transferencia')
+  const [refAbono, setRefAbono] = useState('')
+  const [fechaAbono, setFechaAbono] = useState('')
+  const [errorAbono, setErrorAbono] = useState('')
+  const [guardandoAbono, setGuardandoAbono] = useState(false)
+
+  const supabase = createClient()
+
+  const cargarPagos = async () => {
+    setCargandoPagos(true)
+    const { data } = await supabase
+      .from('pagos_compras')
+      .select('*')
+      .eq('compra_id', compra.id)
+      .order('fecha', { ascending: false })
+    if (data) setPagos(data)
+    setCargandoPagos(false)
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      cargarPagos()
+      setMostrarFormAbono(false)
+      setErrorAbono('')
+      setMontoAbono('')
+      setRefAbono('')
+      setFechaAbono(new Date().toISOString().split('T')[0])
+    }
+  }, [isOpen, compra.id])
+
+  const totalPagado = pagos.reduce((acc, p) => acc + Number(p.monto), 0)
+  const saldoRestante = Math.max(0, compra.total - totalPagado)
+
+  const handleGuardarAbono = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setGuardandoAbono(true)
+    setErrorAbono('')
+
+    const formData = new FormData()
+    formData.append('fecha', fechaAbono)
+    formData.append('monto', montoAbono)
+    formData.append('metodo', metodoAbono)
+    formData.append('referencia', refAbono)
+
+    const res = await registrarPagoCompra(compra.id, formData)
+    if (res.ok) {
+      setMontoAbono('')
+      setRefAbono('')
+      setMostrarFormAbono(false)
+      await cargarPagos()
+    } else {
+      setErrorAbono(res.error || 'Error al guardar el abono')
+    }
+    setGuardandoAbono(false)
+  }
+
+  const handleEliminarAbono = async (pagoId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este abono?')) return
+    const res = await eliminarPagoCompra(pagoId, compra.id)
+    if (res.ok) {
+      await cargarPagos()
+    } else {
+      alert(res.error || 'Error al eliminar el abono')
+    }
+  }
 
   const estadoColors: Record<string, string> = {
     'pendiente': 'text-amber-400 bg-amber-400/10 border border-amber-400/20',
@@ -170,18 +242,165 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
             )}
           </div>
 
+          {/* Sección de Abonos / Pagos */}
+          <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-4 space-y-3">
+            <div className="flex justify-between items-center border-b border-[var(--line-soft)] pb-2">
+              <h4 className="font-serif italic text-[var(--blue)] text-md flex items-center gap-2">
+                <CreditCard className="w-4 h-4" /> Historial de Pagos
+              </h4>
+              {!isEditing && saldoRestante > 0 && !mostrarFormAbono && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMostrarFormAbono(true);
+                    setMontoAbono(saldoRestante.toString());
+                  }}
+                  className="text-xs bg-[var(--blue-dim)] text-[var(--blue)] font-medium px-2.5 py-1.5 rounded-lg hover:bg-[var(--blue)] hover:text-white transition-all flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Registrar Pago / Abono
+                </button>
+              )}
+            </div>
+
+            {mostrarFormAbono && (
+              <div className="bg-[var(--bg-elevated)] border border-[var(--line-soft)] rounded-lg p-3 space-y-3">
+                <h5 className="text-xs font-semibold text-[var(--fg)]">Nuevo Pago / Abono</h5>
+                {errorAbono && (
+                  <div className="text-xs p-2 bg-[var(--red)]/10 text-[var(--red)] rounded-md border border-[var(--red)]/15">
+                    {errorAbono}
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Monto</label>
+                    <input
+                      type="number"
+                      step="any"
+                      required
+                      value={montoAbono}
+                      onChange={e => setMontoAbono(e.target.value)}
+                      placeholder="Monto en COP"
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Fecha</label>
+                    <input
+                      type="date"
+                      required
+                      value={fechaAbono}
+                      onChange={e => setFechaAbono(e.target.value)}
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Método</label>
+                    <select
+                      value={metodoAbono}
+                      onChange={e => setMetodoAbono(e.target.value)}
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                    >
+                      <option value="transferencia">Transferencia</option>
+                      <option value="efectivo">Efectivo</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Referencia</label>
+                    <input
+                      type="text"
+                      value={refAbono}
+                      onChange={e => setRefAbono(e.target.value)}
+                      placeholder="Ej. Nro egreso"
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setMostrarFormAbono(false)}
+                    className="px-2.5 py-1.5 rounded-lg border border-[var(--line-soft)] text-[var(--fg-dim)] hover:text-[var(--fg)] text-xs font-medium transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleGuardarAbono}
+                    disabled={guardandoAbono}
+                    className="px-2.5 py-1.5 rounded-lg bg-[var(--blue)] text-white hover:bg-[#3d6fe5] text-xs font-medium transition-colors flex items-center gap-1"
+                  >
+                    {guardandoAbono ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Guardar'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {cargandoPagos ? (
+              <div className="text-center py-4 text-xs text-[var(--fg-dim)]">Cargando pagos...</div>
+            ) : pagos.length > 0 ? (
+              <div className="overflow-hidden border border-[var(--line-soft)] rounded-lg">
+                <table className="w-full text-left text-xs whitespace-nowrap">
+                  <thead className="bg-[var(--bg-raise)] border-b border-[var(--line-soft)] text-[var(--fg-dim)]">
+                    <tr>
+                      <th className="px-3 py-2 font-medium">Fecha</th>
+                      <th className="px-3 py-2 font-medium">Método</th>
+                      <th className="px-3 py-2 font-medium">Referencia</th>
+                      <th className="px-3 py-2 font-medium text-right">Monto</th>
+                      {!isEditing && <th className="px-3 py-2 font-medium text-right"></th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--line-soft)] bg-[var(--bg-elevated)]">
+                    {pagos.map((p) => (
+                      <tr key={p.id} className="hover:bg-[rgba(255,255,255,0.01)] transition-colors group/row">
+                        <td className="px-3 py-2 text-[var(--fg)]">
+                          {format(new Date(p.fecha + 'T12:00:00'), 'dd MMM, yyyy', { locale: es })}
+                        </td>
+                        <td className="px-3 py-2 text-[var(--fg-dim)] capitalize">{p.metodo}</td>
+                        <td className="px-3 py-2 text-[var(--fg-dim)] truncate max-w-[100px]">{p.referencia || '—'}</td>
+                        <td className="px-3 py-2 text-right text-[var(--fg)] font-medium font-mono">{formatCOP(p.monto)}</td>
+                        {!isEditing && (
+                          <td className="px-3 py-2 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleEliminarAbono(p.id)}
+                              className="text-[var(--red)] hover:text-red-500 opacity-0 group-hover/row:opacity-100 transition-opacity p-1"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-xs text-[var(--fg-dim)] italic bg-[var(--bg-elevated)] border border-[var(--line-soft)] rounded-lg">
+                No se han registrado pagos para esta compra.
+              </div>
+            )}
+          </div>
+
           <div className="bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-xl p-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-[var(--fg-dim)] text-sm">Subtotal</span>
               <span className="text-[var(--fg)]">{formatCOP(compra.subtotal)}</span>
             </div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-2">
               <span className="text-[var(--fg-dim)] text-sm">IVA Total</span>
               <span className="text-[var(--fg)]">{formatCOP(compra.iva_total)}</span>
             </div>
+            <div className="flex justify-between items-center mb-2 border-t border-[var(--line-soft)] pt-2">
+              <span className="text-[var(--fg-dim)] text-sm">Total Factura</span>
+              <span className="text-[var(--fg)] font-medium">{formatCOP(compra.total)}</span>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[var(--fg-dim)] text-sm">Monto Pagado</span>
+              <span className="text-[#4ade80] font-medium">{formatCOP(totalPagado)}</span>
+            </div>
             <div className="flex justify-between items-center border-t border-[var(--line-soft)] pt-3">
-              <span className="text-[var(--fg)] font-medium">Total Factura</span>
-              <span className="text-[var(--blue)] font-bold text-lg">{formatCOP(compra.total)}</span>
+              <span className="text-[var(--fg)] font-medium">Saldo Restante</span>
+              <span className="text-[var(--blue)] font-bold text-lg">{formatCOP(saldoRestante)}</span>
             </div>
           </div>
 

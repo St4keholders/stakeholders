@@ -163,3 +163,150 @@ export async function eliminarCompra(id: string) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+
+export async function registrarPagoCompra(compraId: string, formData: FormData) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    const fecha = formData.get('fecha') as string
+    const montoStr = formData.get('monto') as string
+    const metodo = formData.get('metodo') as string
+    const referencia = formData.get('referencia') as string
+    const notas = formData.get('notes') as string || formData.get('notas') as string
+
+    if (!fecha || !montoStr || !metodo) {
+      return { ok: false, error: 'Faltan campos obligatorios' }
+    }
+
+    const monto = parseFloat(montoStr)
+    if (isNaN(monto) || monto <= 0) {
+      return { ok: false, error: 'El monto debe ser mayor a 0' }
+    }
+
+    // 1. Obtener la compra para saber su total y estado actual
+    const { data: comp, error: errComp } = await supabase
+      .from('compras')
+      .select('total, estado')
+      .eq('id', compraId)
+      .single()
+
+    if (errComp || !comp) throw errComp || new Error('No se encontró la compra')
+
+    // 2. Insertar el pago
+    const { error: errPago } = await supabase
+      .from('pagos_compras')
+      .insert({
+        compra_id: compraId,
+        fecha,
+        monto,
+        metodo,
+        referencia: referencia || null,
+        notas: notas || null
+      })
+
+    if (errPago) throw errPago
+
+    // 3. Sumar todos los pagos para recalcular monto_pagado
+    const { data: pagos } = await supabase
+      .from('pagos_compras')
+      .select('monto')
+      .eq('compra_id', compraId)
+
+    const totalPagado = pagos?.reduce((acc, curr) => acc + Number(curr.monto), 0) || 0
+
+    // 4. Actualizar la compra con el nuevo monto_pagado y estado
+    const nuevoEstado = totalPagado >= comp.total ? 'pagada' : 'pendiente'
+
+    const { error: errUpdate } = await supabase
+      .from('compras')
+      .update({
+        monto_pagado: totalPagado,
+        estado: nuevoEstado
+      })
+      .eq('id', compraId)
+
+    if (errUpdate) throw errUpdate
+
+    revalidatePath('/admin/compras')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    revalidatePath('/admin/contabilidad')
+
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al registrar pago compra:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}
+
+export async function eliminarPagoCompra(pagoId: string, compraId: string) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    // 1. Obtener la compra para saber su total
+    const { data: comp, error: errComp } = await supabase
+      .from('compras')
+      .select('total')
+      .eq('id', compraId)
+      .single()
+
+    if (errComp || !comp) throw errComp || new Error('No se encontró la compra')
+
+    // 2. Eliminar el pago
+    const { error: errDelete } = await supabase
+      .from('pagos_compras')
+      .delete()
+      .eq('id', pagoId)
+
+    if (errDelete) throw errDelete
+
+    // 3. Sumar pagos restantes
+    const { data: pagos } = await supabase
+      .from('pagos_compras')
+      .select('monto')
+      .eq('compra_id', compraId)
+
+    const totalPagado = pagos?.reduce((acc, curr) => acc + Number(curr.monto), 0) || 0
+
+    // 4. Si los pagos restantes son menores al total, y estaba pagada, vuelve a 'pendiente'
+    const nuevoEstado = totalPagado >= comp.total ? 'pagada' : 'pendiente'
+
+    const { error: errUpdate } = await supabase
+      .from('compras')
+      .update({
+        monto_pagado: totalPagado,
+        estado: nuevoEstado
+      })
+      .eq('id', compraId)
+
+    if (errUpdate) throw errUpdate
+
+    revalidatePath('/admin/compras')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    revalidatePath('/admin/contabilidad')
+
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al eliminar pago compra:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}

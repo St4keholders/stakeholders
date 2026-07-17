@@ -149,8 +149,8 @@ export default async function ContabilidadPage({ searchParams }: PageProps) {
     <>
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
         <div>
-          <h1 className="font-serif italic text-3xl text-[var(--fg)] tracking-tight">
-            Contabilidad y *Libros*
+          <h1 className="font-sans font-semibold text-3xl text-[var(--fg)] tracking-tight">
+            Contabilidad y <em className="font-serif italic font-normal text-[var(--blue)]">Libros</em>
           </h1>
           <p className="mt-2 text-[var(--fg-dim)] text-[0.92rem]">
             Consulte el libro diario de operaciones y el mayor auxiliar (Libro T) en tiempo real.

@@ -208,3 +208,150 @@ export async function eliminarCotizacion(id: string) {
     return { ok: false, error: err.message || 'Error interno' }
   }
 }
+
+export async function registrarPagoCotizacion(cotizacionId: string, formData: FormData) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    const fecha = formData.get('fecha') as string
+    const montoStr = formData.get('monto') as string
+    const metodo = formData.get('metodo') as string
+    const referencia = formData.get('referencia') as string
+    const notas = formData.get('notes') as string || formData.get('notas') as string
+
+    if (!fecha || !montoStr || !metodo) {
+      return { ok: false, error: 'Faltan campos obligatorios' }
+    }
+
+    const monto = parseFloat(montoStr)
+    if (isNaN(monto) || monto <= 0) {
+      return { ok: false, error: 'El monto debe ser mayor a 0' }
+    }
+
+    // 1. Obtener la cotización para saber su total
+    const { data: cot, error: errCot } = await supabase
+      .from('cotizaciones')
+      .select('total, estado')
+      .eq('id', cotizacionId)
+      .single()
+
+    if (errCot || !cot) throw errCot || new Error('No se encontró la cotización')
+
+    // 2. Insertar el pago
+    const { error: errPago } = await supabase
+      .from('pagos_cotizaciones')
+      .insert({
+        cotizacion_id: cotizacionId,
+        fecha,
+        monto,
+        metodo,
+        referencia: referencia || null,
+        notas: notas || null
+      })
+
+    if (errPago) throw errPago
+
+    // 3. Sumar todos los pagos para recalcular monto_pagado
+    const { data: pagos } = await supabase
+      .from('pagos_cotizaciones')
+      .select('monto')
+      .eq('cotizacion_id', cotizacionId)
+
+    const totalPagado = pagos?.reduce((acc, curr) => acc + Number(curr.monto), 0) || 0
+
+    // 4. Actualizar la cotización con el nuevo monto_pagado y estado
+    const nuevoEstado = totalPagado >= cot.total ? 'pagada' : 'aceptada'
+
+    const { error: errUpdate } = await supabase
+      .from('cotizaciones')
+      .update({
+        monto_pagado: totalPagado,
+        estado: nuevoEstado
+      })
+      .eq('id', cotizacionId)
+
+    if (errUpdate) throw errUpdate
+
+    revalidatePath('/admin/ventas')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    revalidatePath('/admin/contabilidad')
+
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al registrar pago cotización:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}
+
+export async function eliminarPagoCotizacion(pagoId: string, cotizacionId: string) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+        },
+      }
+    )
+
+    // 1. Obtener la cotización para saber su total
+    const { data: cot, error: errCot } = await supabase
+      .from('cotizaciones')
+      .select('total')
+      .eq('id', cotizacionId)
+      .single()
+
+    if (errCot || !cot) throw errCot || new Error('No se encontró la cotización')
+
+    // 2. Eliminar el pago
+    const { error: errDelete } = await supabase
+      .from('pagos_cotizaciones')
+      .delete()
+      .eq('id', pagoId)
+
+    if (errDelete) throw errDelete
+
+    // 3. Sumar pagos restantes
+    const { data: pagos } = await supabase
+      .from('pagos_cotizaciones')
+      .select('monto')
+      .eq('cotizacion_id', cotizacionId)
+
+    const totalPagado = pagos?.reduce((acc, curr) => acc + Number(curr.monto), 0) || 0
+
+    // 4. Si los pagos restantes son menores al total, y estaba pagada, vuelve a 'aceptada'
+    const nuevoEstado = totalPagado >= cot.total ? 'pagada' : 'aceptada'
+
+    const { error: errUpdate } = await supabase
+      .from('cotizaciones')
+      .update({
+        monto_pagado: totalPagado,
+        estado: nuevoEstado
+      })
+      .eq('id', cotizacionId)
+
+    if (errUpdate) throw errUpdate
+
+    revalidatePath('/admin/ventas')
+    revalidatePath('/admin/tesoreria')
+    revalidatePath('/admin/inicio')
+    revalidatePath('/admin/contabilidad')
+
+    return { ok: true }
+  } catch (err: any) {
+    console.error('Error al eliminar pago cotización:', err)
+    return { ok: false, error: err.message || 'Error interno' }
+  }
+}

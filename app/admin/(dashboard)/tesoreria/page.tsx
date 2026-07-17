@@ -278,8 +278,8 @@ export default async function TesoreriaPage({ searchParams }: PageProps) {
     <>
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
         <div>
-          <h1 className="font-serif italic text-3xl text-[var(--fg)] tracking-tight">
-            Tesorería y *Flujos Contables*
+          <h1 className="font-sans font-semibold text-3xl text-[var(--fg)] tracking-tight">
+            Tesorería y <em className="font-serif italic font-normal text-[var(--blue)]">Flujos Contables</em>
           </h1>
           <p className="mt-2 text-[var(--fg-dim)] text-[0.92rem]">
             Monitoreo en tiempo real de saldos de efectivo, cuentas por cobrar, provisiones y pagos.
