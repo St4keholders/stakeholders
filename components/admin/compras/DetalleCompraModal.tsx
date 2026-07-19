@@ -258,9 +258,9 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
                     {errorAbono}
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Monto</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="block text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Monto</label>
                     <input
                       type="number"
                       step="any"
@@ -268,38 +268,38 @@ export function DetalleCompraModal({ compra }: DetalleCompraModalProps) {
                       value={montoAbono}
                       onChange={e => setMontoAbono(e.target.value)}
                       placeholder="Monto en COP"
-                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)]"
                     />
                   </div>
-                  <div>
-                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Fecha</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="block text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Fecha</label>
                     <input
                       type="date"
                       required
                       value={fechaAbono}
                       onChange={e => setFechaAbono(e.target.value)}
-                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)]"
                     />
                   </div>
-                  <div>
-                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Método</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="block text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Método</label>
                     <select
                       value={metodoAbono}
                       onChange={e => setMetodoAbono(e.target.value)}
-                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] font-sans"
                     >
                       <option value="transferencia">Transferencia</option>
                       <option value="efectivo">Efectivo</option>
                     </select>
                   </div>
-                  <div>
-                    <label className="text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Referencia</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="block text-[0.68rem] uppercase font-mono tracking-wider text-[var(--fg-dim)]">Referencia</label>
                     <input
                       type="text"
                       value={refAbono}
                       onChange={e => setRefAbono(e.target.value)}
                       placeholder="Ej. Nro egreso"
-                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)] mt-0.5"
+                      className="w-full bg-[var(--bg-raise)] border border-[var(--line-soft)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--fg)] outline-none focus:border-[var(--blue)]"
                     />
                   </div>
                 </div>
